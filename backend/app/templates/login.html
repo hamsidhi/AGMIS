@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGMIS Login</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="login-page">
+    <div class="login-container">
+        <div class="login-card">
+            <div class="login-logo-container" style="margin-bottom: 30px;">
+                <img src="/static/logo.png" alt="AGMIS Logo" style="width: 120px; height: auto; filter: drop-shadow(0 0 15px var(--accent-glow));">
+            </div>
+            <h1 class="login-title" style="font-size: 2.2rem; margin-bottom: 5px;">AGMIS</h1>
+            <p class="login-subtitle">Academic Guidance Motivation & Intelligence System</p>
+
+            {% if error %}
+            <div class="login-error" role="alert">
+                Invalid credentials. Please try again.
+            </div>
+            {% endif %}
+
+            <form action="/login" method="post" class="login-form" id="loginForm">
+                <input
+                    id="username"
+                    name="username"
+                    type="text"
+                    placeholder="Student ID / Faculty"
+                    class="input-field"
+                    required
+                    autocomplete="username"
+                    autofocus
+                >
+                <input
+                    id="password"
+                    name="password"
+                    type="password"
+                    placeholder="PIN / Password"
+                    class="input-field"
+                    required
+                    autocomplete="current-password"
+                >
+                <button type="submit" class="btn-login">Sign In</button>
+            </form>
+        </div>
+    </div>
+</body>
+</html>

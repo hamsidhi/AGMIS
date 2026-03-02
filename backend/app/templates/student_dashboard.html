@@ -1,0 +1,481 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>AGMIS Student Dashboard</title>
+    <link rel="stylesheet" href="/static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
+</head>
+<body class="student-dashboard">
+    <div class="page-header">
+        <div class="header-left">
+            <button class="nav-toggle" id="menuToggle" aria-label="Toggle Menu">
+                <span></span>
+                <span></span>
+                <span></span>
+            </button>
+            <div class="logo-wrap" style="margin: 0 15px;">
+                <img src="/static/logo.png" alt="AGMIS Logo" style="height: 36px; width: auto; filter: drop-shadow(0 0 10px var(--accent-glow));">
+            </div>
+            <div class="user-info">
+                <h1 style="display: flex; align-items: center; gap: 8px;">AGMIS <span style="font-weight: 400; color: var(--text-muted); font-size: 1rem;">|</span> {{ user.name }}</h1>
+                <span class="batch-tag">Terminal#2-510 | {{ user.batch }} | {{ user.department }}</span>
+            </div>
+            
+            <div class="subject-dropdown" id="subjectDropdown">
+                <a href="/student/dashboard" class="{% if subject_idx is none %}active{% endif %}">Overall Intelligence</a>
+                {% for s in subjects %}
+                <a href="/student/dashboard?subject_idx={{ loop.index0 }}" 
+                   class="{% if subject_idx is not none and subject_idx == loop.index0 %}active{% endif %}">
+                    {{ s.subject }}
+                </a>
+                {% endfor %}
+            </div>
+        </div>
+        <a href="/logout" class="btn-primary" style="padding: 8px 20px; font-size: 0.8rem; background: var(--bg-primary); color: var(--text-secondary);">System Logout</a>
+    </div>
+
+    <div class="container">
+        <div class="dashboard-grid">
+            <!-- Main Analytics Column -->
+            <div class="main-column">
+                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
+                    <div class="card">
+                        <h3>Current Status</h3>
+                        <p class="stat-value" style="font-size: 2rem; color: var(--cyan);">{{ performance.category }}</p>
+                        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">
+                            Index: <span style="color: #fff;">{{ performance.weighted_score }}%</span>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Performance Prediction</h3>
+                        <p class="stat-value" style="font-size: 2rem; color: var(--accent);">{{ prediction.score }}%</p>
+                        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">
+                            Confidence: <span style="color: #fff;">{{ prediction.confidence }}%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Growth Trajectory Analysis</h3>
+                    <div class="chart-img-wrap" style="height: 350px;">
+                        <canvas id="trajectoryChart"></canvas>
+                    </div>
+                </div>
+
+                <div class="charts-row">
+                    <div class="card">
+                        <h3>Metric Distribution</h3>
+                        <div class="chart-img-wrap" style="height: 300px;">
+                            <canvas id="metricsPieChart"></canvas>
+                        </div>
+                    </div>
+                    <div class="card">
+                        <h3>Efficiency vs Target</h3>
+                        <div class="chart-img-wrap" style="height: 300px;">
+                            <canvas id="comparisonChart"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Intelligence Briefs Column -->
+            <div class="side-column">
+                <!-- Terminal Notifications -->
+                <div class="card">
+                    <h3>Terminal Intelligence Briefs</h3>
+                    <div class="table-scroll" style="max-height: 400px;">
+                        {% for n in notifications %}
+                        <div class="intelligence-brief priority-{{ n.type | lower }}" style="margin-bottom: 12px; position: relative; padding-left: 15px;">
+                            <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
+                                <span class="status-tag" style="font-size: 0.6rem; background: {% if n.type == 'alert' %}rgba(248, 113, 113, 0.1){% else %}rgba(34, 211, 238, 0.1){% endif %}; color: {% if n.type == 'alert' %}var(--danger){% else %}var(--cyan){% endif %};">
+                                    {{ n.type | upper }}
+                                </span>
+                                <span style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted);">{{ n.created_at }}</span>
+                            </div>
+                            <div style="font-size: 0.85rem; color: #fff; line-height: 1.4;">{{ n.message }}</div>
+                            {% if n.subject_code %}
+                            <div style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--cyan); margin-top: 5px; opacity: 0.8;">SOURCE: {{ n.subject_code }}</div>
+                            {% endif %}
+                        </div>
+                        {% else %}
+                        <div style="text-align: center; padding: 20px; color: var(--text-muted);">
+                            <p>No new system notifications.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="card">
+                    <h3>Personalized Intelligence</h3>
+                    <div class="table-scroll" style="max-height: 400px;">
+                        {% for msg in guidance %}
+                        <div class="intelligence-brief priority-{{ msg.priority | lower }}" style="margin-bottom: 12px;">
+                            <div class="brief-header">
+                                <span class="brief-priority priority-{{ msg.priority }}">{{ msg.priority }}</span>
+                            </div>
+                            <div class="brief-observation">{{ msg.observation }}</div>
+                            <div class="brief-action">{{ msg.action }}</div>
+                            <div class="brief-footer">
+                                <span>Impact: <strong>{{ msg.impact }}</strong></span>
+                                <span>Target: <strong>{{ msg.deadline }}</strong></span>
+                            </div>
+                        </div>
+                        {% else %}
+                        <div style="text-align: center; padding: 20px; color: var(--text-muted);">
+                            <p>STABLE: No critical intervention required.</p>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <!-- Study Materials -->
+                <div class="card">
+                    <h3>Study Materials</h3>
+                    <div class="table-scroll">
+                        <table class="styled-table">
+                            <thead>
+                                <tr>
+                                    <th>Title</th>
+                                    <th>Type</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for m in materials %}
+                                <tr>
+                                    <td><a href="{{ m.url }}" target="_blank" download style="color: var(--cyan);">{{ m.title }}</a></td>
+                                    <td><span class="status-tag">{{ m.type }}</span></td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Deadlines & Calendar -->
+                <div class="card">
+                    <h3>Upcoming Deadlines & Events</h3>
+                    <div class="table-scroll">
+                        <table class="styled-table">
+                            <thead>
+                                <tr>
+                                    <th>Event</th>
+                                    <th>Date</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for e in events %}
+                                <tr>
+                                    <td>{{ e.title }}</td>
+                                    <td style="font-family: var(--font-mono);">{{ e.event_date }}</td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+
+                <!-- Messaging / Doubt Sessions -->
+                <div class="card">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px;">
+                        <h3 style="margin: 0;">Messages & Doubt Sessions</h3>
+                        <button class="btn-primary" style="font-size: 0.7rem; padding: 5px 10px;" onclick="askDoubt()">Ask Doubt</button>
+                    </div>
+                    <div class="table-scroll" style="max-height: 400px;">
+                        {% for msg in messages %}
+                        <div style="padding: 10px; border-bottom: 1px solid var(--glass-border);">
+                            <div style="font-size: 0.7rem; color: var(--text-muted);">From: {{ msg.sender_id }}</div>
+                            <div style="margin: 5px 0;">{{ msg.message }}</div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+    <script id="chart-data" type="application/json">{{ chart_data | tojson | safe }}</script>
+    <!-- Doubt Modal -->
+    <div id="doubtModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="card" style="width: 100%; max-width: 500px; padding: 40px;">
+            <h2 style="margin-top: 0; margin-bottom: 20px;">Ask a Doubt</h2>
+            <form id="doubtForm" class="login-form">
+                <select name="subject_code" id="doubtSubject" class="input-field" style="background: var(--bg-primary); border: 1px solid var(--glass-border); color: #fff; padding: 12px; margin-bottom: 15px;" required>
+                    <option value="GLOBAL">General / System Inquiry</option>
+                    {% for s in subjects %}
+                    <option value="{{ s.subject }}">{{ s.subject }}</option>
+                    {% endfor %}
+                </select>
+                <textarea name="message" placeholder="Type your query/doubt here..." class="input-field" style="min-height: 150px; resize: none;" required></textarea>
+                
+                <div style="display: flex; gap: 15px; margin-top: 20px;">
+                    <button type="submit" class="btn-login" style="flex: 2; margin: 0;">Send Query</button>
+                    <button type="button" class="btn-primary" style="flex: 1; background: var(--bg-primary); color: var(--text-secondary); border: 1px solid var(--glass-border);" onclick="closeDoubtModal()">Cancel</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Real-Time Sync: AJAX Auto-Refresh every 30 seconds
+            setInterval(async () => {
+                console.log("Terminal Sync: Fetching latest intelligence...");
+                location.reload(); // Lightweight refresh to ensure latest DB state
+            }, 30000);
+
+            // Register DataLabels
+            if (typeof ChartDataLabels !== 'undefined') {
+                Chart.register(ChartDataLabels);
+            }
+
+            // Global Chart.js Defaults for Professional Cyber Aesthetics
+            Object.assign(Chart.defaults, {
+                font: {
+                    family: "'Plus Jakarta Sans', sans-serif",
+                    size: 11
+                },
+                color: '#94a3b8',
+                responsive: true,
+                maintainAspectRatio: false,
+                animation: {
+                    duration: 2000,
+                    easing: 'easeOutQuart'
+                },
+                plugins: {
+                    legend: {
+                        labels: {
+                            usePointStyle: true,
+                            padding: 20,
+                            font: { size: 12, weight: '500' }
+                        }
+                    },
+                    tooltip: {
+                        backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                        titleFont: { size: 13, weight: 'bold' },
+                        bodyFont: { size: 12 },
+                        padding: 12,
+                        cornerRadius: 8,
+                        borderColor: 'rgba(255, 255, 255, 0.1)',
+                        borderWidth: 1,
+                        displayColors: true
+                    }
+                }
+            });
+
+            const chartDataEl = document.getElementById('chart-data');
+            if (!chartDataEl) return;
+            const chartData = JSON.parse(chartDataEl.textContent);
+            
+            const colors = {
+                accent: '#6366f1',       /* Indigo Neon */
+                accentLight: 'rgba(99, 102, 241, 0.15)',
+                cyan: '#22d3ee',
+                attendance: '#818cf8',   /* Indigo variant */
+                submission: '#2dd4bf',   /* Vibrant Teal */
+                internal: '#fbbf24',     /* Vibrant Amber */
+                excellent: '#10b981',
+                good: '#3b82f6',
+                average: '#f59e0b',
+                at_risk: '#f97316',
+                critical: '#ef4444'
+            };
+
+            // 1. Trajectory Area Prediction Chart (Enhanced with Permanent Indexes)
+            const ctxTrajectory = document.getElementById('trajectoryChart');
+            if (ctxTrajectory) {
+                const ctx = ctxTrajectory.getContext('2d');
+                const areaGradient = ctx.createLinearGradient(0, 0, 0, 400);
+                areaGradient.addColorStop(0, 'rgba(99, 102, 241, 0.4)');
+                areaGradient.addColorStop(1, 'rgba(15, 23, 42, 0)');
+
+                new Chart(ctx, {
+                    type: 'line',
+                    data: {
+                        labels: chartData.trend_weeks,
+                        datasets: [{
+                            label: 'Intelligence Growth Path',
+                            data: chartData.predicted_path,
+                            borderColor: colors.accent,
+                            backgroundColor: areaGradient,
+                            borderWidth: 4,
+                            pointBackgroundColor: (ctx) => ctx.dataIndex >= chartData.actual_scores.length ? colors.critical : colors.accent,
+                            pointBorderColor: '#fff',
+                            pointBorderWidth: 2,
+                            pointRadius: 6,
+                            pointHoverRadius: 12,
+                            tension: 0.45,
+                            fill: true,
+                            segment: {
+                                borderDash: (ctx) => ctx.p0DataIndex >= chartData.actual_scores.length - 1 ? [8, 5] : undefined,
+                                borderColor: (ctx) => ctx.p0DataIndex >= chartData.actual_scores.length - 1 ? colors.critical : colors.accent
+                            },
+                            datalabels: {
+                                display: true,
+                                backgroundColor: (ctx) => ctx.dataIndex >= chartData.actual_scores.length ? colors.critical : colors.accent,
+                                borderRadius: 4,
+                                color: '#fff',
+                                font: { weight: '900', size: 10, family: 'var(--font-mono)' },
+                                padding: 4,
+                                align: 'top',
+                                offset: 10,
+                                formatter: (v) => v + '%',
+                                textShadowColor: 'rgba(0,0,0,0.5)',
+                                textShadowBlur: 4
+                            }
+                        }]
+                    },
+                    options: {
+                        plugins: {
+                            legend: { display: false },
+                            tooltip: {
+                                backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                                callbacks: {
+                                    label: (ctx) => {
+                                        const isPred = ctx.dataIndex >= chartData.actual_scores.length;
+                                        return (isPred ? 'PREDICTED: ' : 'ACTUAL: ') + ctx.parsed.y + '%';
+                                    }
+                                }
+                            }
+                        },
+                        scales: {
+                            y: { 
+                                min: 0, max: 110, 
+                                grid: { color: 'rgba(255, 255, 255, 0.02)', drawBorder: false },
+                                ticks: { color: '#64748b', font: { family: 'var(--font-mono)' } }
+                            },
+                            x: { 
+                                grid: { display: false },
+                                ticks: { color: '#94a3b8', font: { weight: '800' } }
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 2. Metric Intelligence Map (Enhanced Radar with Values)
+            const ctxMetrics = document.getElementById('metricsPieChart');
+            if (ctxMetrics) {
+                new Chart(ctxMetrics.getContext('2d'), {
+                    type: 'radar',
+                    data: {
+                        labels: ['Attendance', 'Submissions', 'Internals'],
+                        datasets: [{
+                            label: 'Performance Intelligence',
+                            data: chartData.metrics,
+                            backgroundColor: 'rgba(34, 211, 238, 0.25)',
+                            borderColor: colors.cyan,
+                            borderWidth: 3,
+                            pointBackgroundColor: colors.cyan,
+                            pointBorderColor: '#fff',
+                            pointHoverRadius: 8
+                        }]
+                    },
+                    options: {
+                        scales: {
+                            r: {
+                                min: 0, max: 100,
+                                grid: { color: 'rgba(255, 255, 255, 0.08)' },
+                                angleLines: { color: 'rgba(255, 255, 255, 0.15)' },
+                                pointLabels: { 
+                                    color: '#fff', 
+                                    font: { weight: '800', size: 12, family: 'var(--font-mono)' } 
+                                },
+                                ticks: { display: false }
+                            }
+                        },
+                        plugins: {
+                            legend: { display: false },
+                            datalabels: {
+                                display: true,
+                                color: colors.cyan,
+                                font: { weight: '900', size: 12, family: 'var(--font-mono)' },
+                                anchor: 'end',
+                                align: 'top',
+                                offset: 5,
+                                formatter: (v) => v + '%'
+                            }
+                        }
+                    }
+                });
+            }
+
+            // 3. Efficiency Matrix (Enhanced Progress Rings with Inner Values)
+            const ctxComparison = document.getElementById('comparisonChart');
+            if (ctxComparison) {
+                new Chart(ctxComparison.getContext('2d'), {
+                    type: 'doughnut',
+                    data: {
+                        labels: ['Attendance', 'Submissions', 'Internals'],
+                        datasets: [
+                            {
+                                data: [chartData.metrics[0], 100 - chartData.metrics[0]],
+                                backgroundColor: [colors.attendance, 'rgba(255,255,255,0.02)'],
+                                borderWidth: 0, weight: 0.5, cutout: '88%'
+                            },
+                            {
+                                data: [chartData.metrics[1], 100 - chartData.metrics[1]],
+                                backgroundColor: [colors.submission, 'rgba(255,255,255,0.02)'],
+                                borderWidth: 0, weight: 0.5, cutout: '82%'
+                            },
+                            {
+                                data: [chartData.metrics[2], 100 - chartData.metrics[2]],
+                                backgroundColor: [colors.internal, 'rgba(255,255,255,0.02)'],
+                                borderWidth: 0, weight: 0.5, cutout: '76%'
+                            }
+                        ]
+                    },
+                    options: {
+                        spacing: 12,
+                        borderRadius: 25,
+                        plugins: {
+                            legend: { 
+                                position: 'right', 
+                                labels: { 
+                                    padding: 15, usePointStyle: true, color: '#94a3b8',
+                                    font: { family: 'var(--font-mono)', size: 11, weight: '700' },
+                                    generateLabels: (chart) => [
+                                        { text: 'ATTN: ' + chartData.metrics[0] + '%', fillStyle: colors.attendance },
+                                        { text: 'SUBM: ' + chartData.metrics[1] + '%', fillStyle: colors.submission },
+                                        { text: 'INTL: ' + chartData.metrics[2] + '%', fillStyle: colors.internal }
+                                    ]
+                                } 
+                            },
+                            datalabels: { display: false }
+                        }
+                    }
+                });
+            }
+        });
+
+        function askDoubt() {
+            document.getElementById('doubtModal').style.display = 'flex';
+        }
+        function closeDoubtModal() {
+            document.getElementById('doubtModal').style.display = 'none';
+        }
+
+        document.getElementById('doubtForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            const res = await fetch('/api/messages/send', { method: 'POST', body: formData });
+            if (res.ok) location.reload();
+        };
+
+        const menuToggle = document.getElementById('menuToggle');
+        const subjectDropdown = document.getElementById('subjectDropdown');
+
+        if (menuToggle) {
+            menuToggle.addEventListener('click', (e) => {
+                e.stopPropagation();
+                subjectDropdown.classList.toggle('active');
+            });
+        }
+        document.addEventListener('click', () => {
+            if (subjectDropdown) subjectDropdown.classList.remove('active');
+        });
+    </script>
+</body>
+</html>

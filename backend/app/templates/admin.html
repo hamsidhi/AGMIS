@@ -1,0 +1,95 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>AGMIS Admin</title>
+  <link rel="stylesheet" href="/static/style.css">
+  <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+  <style>
+    .form-grid { display: grid; grid-template-columns: repeat(6, 1fr); gap: 8px; }
+    .form-grid input { width: 100%; padding: 8px; border: 1px solid var(--border); border-radius: var(--radius); background: var(--bg-elevated); color: var(--text-primary); }
+    .table-small th, .table-small td { font-size: 0.85rem; }
+  </style>
+ </head>
+<body class="faculty-dashboard">
+  <div class="container">
+    <header class="page-header">
+      <h1>Admin — Manage Faculty and Weights</h1>
+      <div class="actions">
+        <a href="/logout" class="btn-secondary">Logout</a>
+      </div>
+    </header>
+
+    <div class="card">
+      <h3>Faculty Accounts</h3>
+      <div class="table-scroll">
+        <table class="styled-table table-small">
+          <thead>
+            <tr>
+              <th>Username</th>
+              <th>Name</th>
+              <th>Subject</th>
+              <th>Email</th>
+              <th>Save</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for f in faculty %}
+            <tr>
+              <form action="/admin/faculty/update" method="post">
+                <td><input name="username" value="{{ f.username }}" readonly></td>
+                <td><input name="name" value="{{ f.name or '' }}"></td>
+                <td><input name="subject_name" value="{{ f.subject_name or '' }}"></td>
+                <td><input name="email" value="{{ f.email or '' }}"></td>
+                <td><button class="btn-primary" type="submit">Save</button></td>
+              </form>
+            </tr>
+          {% else %}
+            <tr><td colspan="5" class="text-muted">No faculty users.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+    </div>
+
+    <div class="card">
+      <h3>Subject Weights</h3>
+      <p class="text-muted">Email notifications enabled: {{ 'Yes' if email_enabled else 'No' }}</p>
+      <div class="table-scroll">
+        <table class="styled-table table-small">
+          <thead>
+            <tr>
+              <th>Subject</th>
+              <th>Lecture</th>
+              <th>Practical</th>
+              <th>Assignments</th>
+              <th>Internals</th>
+              <th>Externals</th>
+              <th>Save</th>
+            </tr>
+          </thead>
+          <tbody>
+          {% for w in weights %}
+            <tr>
+              <form action="/admin/weights/save" method="post" class="form-grid">
+                <input name="subject" value="{{ w.subject }}" readonly>
+                <input name="w_lec" type="number" step="0.01" min="0" max="1" value="{{ w.w_lec }}">
+                <input name="w_prac" type="number" step="0.01" min="0" max="1" value="{{ w.w_prac }}">
+                <input name="w_assign" type="number" step="0.01" min="0" max="1" value="{{ w.w_assign }}">
+                <input name="w_internal" type="number" step="0.01" min="0" max="1" value="{{ w.w_internal }}">
+                <input name="w_external" type="number" step="0.01" min="0" max="1" value="{{ w.w_external }}">
+                <button class="btn-primary" type="submit">Save</button>
+              </form>
+            </tr>
+          {% else %}
+            <tr><td colspan="7" class="text-muted">No subjects found. Add a faculty with a subject first.</td></tr>
+          {% endfor %}
+          </tbody>
+        </table>
+      </div>
+      <p class="text-muted">Weights will be normalized to sum to 1.</p>
+    </div>
+  </div>
+</body>
+</html>
