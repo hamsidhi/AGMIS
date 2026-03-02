@@ -355,54 +355,42 @@
                 });
             }
 
-            // 2. Metric Intelligence Map (Enhanced Radar with Values)
+            // 2. Metric Intelligence Map
             const ctxMetrics = document.getElementById('metricsPieChart');
             if (ctxMetrics) {
                 new Chart(ctxMetrics.getContext('2d'), {
-                    type: 'radar',
+                    type: 'polarArea',
                     data: {
                         labels: ['Attendance', 'Submissions', 'Internals'],
                         datasets: [{
-                            label: 'Performance Intelligence',
                             data: chartData.metrics,
-                            backgroundColor: 'rgba(34, 211, 238, 0.25)',
-                            borderColor: colors.cyan,
-                            borderWidth: 3,
-                            pointBackgroundColor: colors.cyan,
-                            pointBorderColor: '#fff',
-                            pointHoverRadius: 8
+                            backgroundColor: [colors.attendance + '44', colors.submission + '44', colors.internal + '44'],
+                            borderColor: [colors.attendance, colors.submission, colors.internal],
+                            borderWidth: 3
                         }]
                     },
                     options: {
-                        scales: {
-                            r: {
-                                min: 0, max: 100,
-                                grid: { color: 'rgba(255, 255, 255, 0.08)' },
-                                angleLines: { color: 'rgba(255, 255, 255, 0.15)' },
-                                pointLabels: { 
-                                    color: '#fff', 
-                                    font: { weight: '800', size: 12, family: 'var(--font-mono)' } 
-                                },
-                                ticks: { display: false }
-                            }
-                        },
+                        scales: { r: { ticks: { display: false }, grid: { color: 'rgba(255,255,255,0.08)' }, angleLines: { color: 'rgba(255,255,255,0.15)' } } },
                         plugins: {
-                            legend: { display: false },
+                            legend: { position: 'bottom' },
                             datalabels: {
-                                display: true,
-                                color: colors.cyan,
+                                color: '#fff',
                                 font: { weight: '900', size: 12, family: 'var(--font-mono)' },
-                                anchor: 'end',
-                                align: 'top',
-                                offset: 5,
-                                formatter: (v) => v + '%'
+                                formatter: (v, ctx) => {
+                                    const label = ctx.chart.data.labels[ctx.dataIndex];
+                                    return label + '\\n' + v + '%';
+                                },
+                                textAlign: 'center',
+                                backgroundColor: 'rgba(15, 23, 42, 0.6)',
+                                borderRadius: 4,
+                                padding: 4
                             }
                         }
                     }
                 });
             }
 
-            // 3. Efficiency Matrix (Enhanced Progress Rings with Inner Values)
+            // 3. Efficiency Matrix
             const ctxComparison = document.getElementById('comparisonChart');
             if (ctxComparison) {
                 new Chart(ctxComparison.getContext('2d'), {
@@ -443,9 +431,42 @@
                                     ]
                                 } 
                             },
-                            datalabels: { display: false }
+                            datalabels: { display: false },
+                            tooltip: {
+                                callbacks: {
+                                    label: (ctx) => {
+                                        const label = ctx.chart.data.labels[ctx.datasetIndex];
+                                        const val = chartData.metrics[ctx.datasetIndex];
+                                        return label + ': ' + val + '%';
+                                    }
+                                }
+                            }
                         }
-                    }
+                    },
+                    plugins: [{
+                        id: 'ringLabels',
+                        afterDraw: (chart) => {
+                            const { ctx } = chart;
+                            const metas = chart._metasets || chart.getSortedVisibleDatasetMetas();
+                            metas.forEach((meta, i) => {
+                                const arc = meta.data[0];
+                                if (!arc) return;
+                                const centerX = arc.x;
+                                const centerY = arc.y;
+                                const r = (arc.innerRadius + arc.outerRadius) / 2;
+                                const angle = -Math.PI / 2;
+                                const x = centerX + Math.cos(angle) * r;
+                                const y = centerY + Math.sin(angle) * r + 4;
+                                ctx.save();
+                                ctx.fillStyle = '#fff';
+                                ctx.font = '900 14px var(--font-mono)';
+                                const val = chartData.metrics[i] + '%';
+                                ctx.textAlign = 'center';
+                                ctx.fillText(val, x, y);
+                                ctx.restore();
+                            });
+                        }
+                    }]
                 });
             }
         });
