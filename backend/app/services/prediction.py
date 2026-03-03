@@ -1,11 +1,11 @@
+import statistics
+
 class PredictionService:
-    def predict_subject_score(self, metrics, weights=None):
+    def calculate_base_score(self, metrics, weights=None):
         """
+        Calculates the raw weighted score for a student without trend/momentum effects.
         Input: [lec_attn, prac_attn, assign_pct, internal, external, practical]
-        Returns: score (0-100), category
         """
-        # Manual weight calculation for subject-wise accuracy
-        # Lecture (20%), Practical (10%), Assignments (10%), Internal (20%), External (40%)
         l_pct, p_pct, a_pct, i_val, e_val, pr_val = metrics
         
         # Normalize marks to percentages
@@ -26,15 +26,77 @@ class PredictionService:
             w_lec, w_prac, w_assign, w_internal, w_external = 0.20, 0.10, 0.10, 0.20, 0.40
             total_w = 1.0
 
-        score = (l_pct * w_lec) + (p_pct * w_prac) + (a_pct * w_assign) + (internal_pct * w_internal) + (external_pct * w_external)
+        return (l_pct * w_lec) + (p_pct * w_prac) + (a_pct * w_assign) + (internal_pct * w_internal) + (external_pct * w_external)
+
+    def predict_subject_score(self, metrics, weights=None, historical_scores=None, doubt_intensity=0):
+        """
+        Input: [lec_attn, prac_attn, assign_pct, internal, external, practical]
+        historical_scores: list of recent scores (max 4-6) to calculate trend.
+        doubt_intensity: integer count of recent tagged doubts.
+        Returns: score (0-100), category, risk_tier, confidence
+        """
+        current_score = self.calculate_base_score(metrics, weights)
         
-        # Refined category thresholds for better accuracy
-        if score >= 85: cat = "Excellent"
-        elif score >= 70: cat = "Good"
-        elif score >= 55: cat = "Average"
-        elif score >= 40: cat = "At Risk"
-        else: cat = "Critical"
+        # 1. Trend Analysis (Momentum)
+        momentum = 0.0
+        confidence = 50.0 # Base confidence for single-shot predict
         
-        return {"score": round(score, 2), "cat": cat}
+        if historical_scores and len(historical_scores) > 0:
+            # We have past data. Calculate slope.
+            history = historical_scores[-4:] # Last 4 weeks
+            avg_history = sum(history) / len(history)
+            trend_slope = current_score - avg_history
+            
+            # Dampened trend to prevent infinite scaling
+            if trend_slope > 5:
+                momentum += 5.0
+            elif trend_slope < -5:
+                momentum -= 5.0
+            else:
+                momentum += trend_slope * 0.5 # Small momentum
+                
+            # Variance for confidence score
+            if len(history) > 1:
+                variance = statistics.stdev(history + [current_score])
+                # High variance lowers confidence
+                confidence_penalty = min(variance * 1.5, 30.0) 
+                confidence = 85.0 - confidence_penalty + (len(history) * 2) # More data = higher confidence
+            else:
+                confidence = 65.0
+        
+        # 2. Doubt Intensity Modifier
+        if doubt_intensity > 5:
+            # High intensity signals confusion. We lower the prediction to act as an "early-warning" intervention cue.
+            momentum -= min(doubt_intensity * 0.5, 5.0) # Up to -5 penalty
+            
+        future_score = current_score + momentum
+        
+        # Clamp score between 0 and 100
+        future_score = max(0.0, min(100.0, future_score))
+        confidence = max(0.0, min(100.0, confidence))
+        
+        # 3. Categorization & Risk Tiering
+        if future_score >= 85: 
+            cat = "Excellent"
+            risk = "🔵 High Performer"
+        elif future_score >= 70: 
+            cat = "Good"
+            risk = "🟢 Stable"
+        elif future_score >= 55: 
+            cat = "Average"
+            risk = "🟡 Moderate Risk"
+        elif future_score >= 40: 
+            cat = "At Risk"
+            risk = "🔴 High Risk"
+        else: 
+            cat = "Critical"
+            risk = "🔴 High Risk"
+            
+        return {
+            "score": round(future_score, 2), 
+            "cat": cat,
+            "risk_tier": risk,
+            "confidence": round(confidence, 1)
+        }
 
 predict_service = PredictionService()

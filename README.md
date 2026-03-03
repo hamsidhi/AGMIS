@@ -1,111 +1,152 @@
-# AGMIS — Academic Guidance & Intelligence System
+# AGMIS — Academic Guidance, Motivation & Intelligence System
 
 **Final Year B.Sc Data Science · Atharva College, Malad**
 
-AGMIS turns routine academic data into an **intelligent, predictive, and actionable** guidance system so faculty and students can spot problems 4–6 weeks before critical exams.
+AGMIS is an advanced, intelligence-driven academic platform designed to transform regular student data into predictive, actionable guidance. It allows faculty and administrators to monitor student performance in real-time and predict future exam scores, addressing potential drop-outs or failures 4-6 weeks before critical examinations occur.
 
-## What It Does
+![AGMIS Banner](https://via.placeholder.com/800x200.png?text=AGMIS+Command+Center)
 
-- **Classify** current performance into 5 levels: Excellent / Good / Average / At Risk / Critical (Random Forest).
-- **Predict** next exam score (e.g. CEM-2) with a confidence range (regression model).
-- **Guide** with rule-based, specific advice (e.g. “Improve attendance to 85%+ to gain ~8 marks”).
-- **Dashboards** for faculty (batch analytics, at-risk list, upload) and students (performance, prediction, guidance).
+## 🌟 Core Features
 
-## Product Definition (from PRD)
+AGMIS provides three distinct levels of access and functionality:
 
-> *"AGMIS analyzes academic data to classify where a student stands today, predict where they are heading in future exams, and guide them on what specific actions will improve outcomes — transparently and ethically."*
+### 1. Student Dossiers (Student View)
+- **Predictive Scoring**: Uses a trained Random Forest and Regression ML models to predict upcoming exam scores based on historical attendance, assignments, and exam performance.
+- **Risk Classification**: Classifies students into distinct risk profiles: Critical, High Risk, Moderate, and High Performer.
+- **Personalized Actionable Guidance**: Generates rule-based, specific advice tailored to the student (e.g., “Improve attendance to 85%+ to gain ~8 marks”).
+- **Direct Faculty Communication**: Students can securely ask questions and seek doubt clarifications from their dedicated subject faculty.
 
-## Tech Stack
+### 2. Faculty Command Center (Faculty View)
+- **Batch Analytics & Insights**: A holistic view of the assigned class, dynamically plotting the predictive performance distribution.
+- **At-Risk Identification**: Readily identifiable flags pinpoint students classified as "Critical" or "High Risk," focusing intervention efforts where they matter most.
+- **Doubt Management System**: Faculty can review and directly answer specific doubts and queries raised by students under their purview, featuring full chat history and summarization.
+- **Student Management**: Faculty can directly manage their students, including the ability to reset compromised student passwords securely.
+- **Data Integration**: Easy drag-and-drop CSV upload for ingesting new attendance and marks data, automatically updating predictions on the fly.
 
-| Layer        | Technology                          |
-|-------------|--------------------------------------|
-| Frontend    | HTML, CSS, Jinja2 templates, Chart.js |
-| Backend     | FastAPI (Python)                     |
-| Database    | SQLite (local) / Supabase (optional) |
-| ML          | scikit-learn (Random Forest, regression) |
-| Auth        | Session/cookie (username + password) |
+### 3. Institutional Risk Console (Admin View)
+- **Global Surveillance**: Admins oversee the entire institution’s real-time risk distribution across all active subjects and batches.
+- **Faculty Deployment & Evaluation**: Admins can safely deploy new faculty, manage their access credentials, and monitor their active caseloads and resolved doubt volumes. (Features Safe Soft-Deletes and UPSERT re-creation).
+- **Global Account Management**: Admins possess overarching authority to reset passwords for both Faculty members and Students across the entire system.
+- **Communication Visibility**: Broad-scale monitoring of system communications flagged by predictive models (e.g., Burnout Warning badges on highly stressed students who send 5+ queries a week).
+- **Secure, Vintage Theming**: Completely overhauled UI/UX design with an immersive "Oldschool Detective Dossier" vibe—featuring high-contrast khaki, beige, and strict monospace typography.
 
-## Project Structure
+---
 
-```
+## 🏗️ Technical Architecture
+
+AGMIS follows a classic monolithic Model-View-Controller architecture built on a high-performance Python backend.
+
+| Layer        | Technology                                                                 |
+|--------------|-----------------------------------------------------------------------------|
+| **Frontend** | Pure HTML/CSS styled with a Vintage Light Theme, Jinja2 Templates, Chart.js JS graphs |
+| **Backend**  | FastAPI (Python) for asynchronous endpoints and robust validation          |
+| **Database** | SQLite3 (Local file-based database for portability)                        |
+| **Machine Learning** | `scikit-learn` (Random Forest, Linear Regression, Joblib Serialization) |
+
+### Key Project Structure
+
+```bash
 agmis/
 ├── backend/
 │   ├── app/
-│   │   ├── api/           # API route modules (Supabase/optional)
-│   │   ├── core/          # Config
-│   │   ├── schemas/       # Pydantic models
-│   │   ├── services/     # DB, features, classification, prediction, guidance
-│   │   ├── static/       # CSS
-│   │   ├── templates/    # Faculty & student dashboards, login
-│   │   └── main.py       # App entry, routes, login, upload
-│   ├── models/           # Saved ML models (.joblib)
-│   ├── local.db          # SQLite DB (created on first run)
-│   └── requirements.txt
-├── DOCS/                 # PRD and other docs
-├── README.md             # This file
-└── PROJECT_STATUS.md     # PRD vs implementation status
+│   │   ├── ml/                # Scikit-Learn data pipelines & predictors
+│   │   ├── services/          # Database connection, CRUD operations, & queries
+│   │   ├── static/            # Vintage/Beige CSS files & static assets
+│   │   ├── templates/         # HTML Jinja2 Views (Login, Admin, Faculty, Student)
+│   │   └── main.py            # FastAPI Application Entrypoint & JSON Routes
+│   ├── models/                # Saved serialized ML Models (.joblib)
+│   └── agmis.db               # The generated SQLite Database
+└── README.md                  # This documentation
 ```
 
-## How to Run
+---
 
-1. **Clone and enter backend**
-   ```bash
-   cd agmis/backend
-   ```
+## 🚀 Quickstart & Installation
 
-2. **Create virtual environment and install dependencies**
-   ```bash
-   python -m venv venv
-   venv\Scripts\activate    # Windows
-   pip install -r requirements.txt
-   ```
-   Add ML/data deps if needed:
-   ```bash
-   pip install pandas numpy scikit-learn joblib
-   ```
+To run AGMIS locally on your machine, you must have `Python 3.9+` installed.
 
-3. **Run the app**
-   ```bash
-   python -m uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
-   ```
-   Or:
-   ```bash
-   python -m app.main
-   ```
+### 1. Clone the Repository & Enter Directory
+```bash
+git clone https://github.com/your-username/agmis.git
+cd agmis/backend
+```
 
-4. **Open in browser**
-   - Login: http://127.0.0.1:8000/
-   - **Faculty**: e.g. `hiral` / `ml123` (subject: Machine Learning)
-   - **Students**: After a faculty CSV upload, each student can log in with:
-     - **Username** = `student_id` from the CSV (e.g. `101`, `202`)
-     - **Password** = `1234` (set in `backend/app/services/database.py` in `save_faculty_data`)
+### 2. Set Up the Virtual Environment
+```bash
+# Windows
+python -m venv venv
+venv\Scripts\activate
 
-## CSV Upload Format (Faculty)
+# macOS / Linux
+python3 -m venv venv
+source venv/bin/activate
+```
 
-Expected columns (names may vary; ensure mapping in code):
+### 3. Install Required Dependencies
+```bash
+pip install -r requirements.txt
+```
+*If you are generating predictions, make sure the ML stack is installed:*
+```bash
+pip install fastapi uvicorn multipart jinja2 scikit-learn pandas python-multipart
+```
 
-- `student_id`, `name`, `week`
-- `lecture_present`, `lecture_total`, `practical_present`, `practical_total`
-- `assignments_submitted`, `assignments_total`
-- `internal_marks`, `external_marks`, `practical_marks`
+### 4. Boot the Command Center
+You can manually start the application using `uvicorn`:
+```bash
+cd backend
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
+```
+*(The `--reload` flag will auto-refresh the server when file changes are detected).*
 
-The app computes percentages and runs the prediction pipeline on upload.
+---
 
-## Reference
+## 🧪 Generating Mock Data
 
-- **PRD**: `New folder/DOCS/📘 ACADEMIC GUIDANCE & INTELLIGENCE SYSTEM (AGMIS) PRD.pdf`
-- **Status vs PRD**: see [PROJECT_STATUS.md](PROJECT_STATUS.md).
+For testing the application, AGMIS includes a robust data generator that creates realistic, synchronized student records across multiple subjects, batches, and weeks.
 
-## License & Use
+```bash
+python mock_data_generator.py
+```
 
-Academic project. Do not use production credentials or real student PII in open repos.
+This script will automatically generate a `mock_data/` directory containing CSV files for:
+- **Batches**: Year1_A1, Year1_B1
+- **Subjects**: Machine Learning, Data Governance, Computer Networks, Software Engineering, Database Systems
+- **Timeline**: Week 1, Week 2, Week 3
 
+*Note: The script ensures that student names and IDs remain perfectly consistent across all subjects and weeks for a given batch, making it ideal for testing historical tracking and multi-subject analytics.*
 
-one click start
-1-cd E:\Projects\agmis\backend
-.\venv\Scripts\Activate
-uvicorn app.main:app --reload --host 127.0.0.1 --port 8001
+---
 
-2-cd E:\Projects\agmis\backend
-.\venv\Scripts\Activate
-uvicorn app.main:app --reload --host 127.0.0.1 --port 8001
+## 🔑 Default Authorization Credentials
+
+To access the various dashboards, navigate to `http://127.0.0.1:8000` in your web browser. 
+Due to the system's strict architectural separation, you must log in using the correct assigned identifiers.
+
+- **Admin Console:**
+  - *Username:* `admin`
+  - *Password:* `admin`
+- **Faculty View (Machine Learning):**
+  - *Username:* `hiral`
+  - *Password:* `ml123`
+- **Student View:**
+  - Login requires a valid `student_id` created via Faculty CSV Upload. 
+  - *Default Password:* `1234`
+
+---
+
+## 📊 Standard CSV Data Format 
+
+For the Machine Learning pipelines to process data correctly, Faculty batch-uploads must be formatted as follows:
+
+| student_id | name | week | lecture_present | lecture_total | assignments_submitted | internal_marks |
+|------------|------|------|-----------------|---------------|-----------------------|----------------|
+| 101        | John | 1    | 8               | 10            | 2                     | 18             |
+
+Upon successful upload via the Faculty Dashboard, AGMIS immediately normalizes the data, runs the active predictive algorithm, saves the new output predictions to the Database, and updates the Global Risk Distribution graphs.
+
+---
+
+## 🔒 Security & License
+*AGMIS is a Final Year Academic Capstone Project.*
+While safe architectural patterns (such as Soft-Deletes via the `is_active` flag, session cookie limits, and password salting mechanisms) have been built into the database structures to resemble a production application, please DO NOT deploy this publicly with real Student Personally Identifiable Information (PII) without migrating the authentication system to a secure provider (like OAuth2 or Supabase) and enabling strict HTTPS routing protocols.

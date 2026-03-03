@@ -1,25 +1,32 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AGMIS – {{ user.name }} (Faculty view)</title>
     <link rel="stylesheet" href="/static/style.css">
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
     <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/chartjs-plugin-datalabels@2"></script>
 </head>
+
 <body class="faculty-dashboard">
     <div class="page-header">
         <div class="header-left">
             <div class="user-info">
                 <h1>{{ user.name }} Analysis</h1>
-                <span class="batch-tag">Terminal#2-510 | Student ID: {{ user.student_id }} | {{ faculty.subject_name }}</span>
+                <span class="batch-tag">Terminal#2-510 | Student ID: {{ user.student_id }} | {{ faculty.subject_name
+                    }}</span>
             </div>
         </div>
         <div class="actions">
-            <a href="/faculty/dashboard" class="btn-primary" style="padding: 10px 20px; font-size: 0.8rem; border-radius: 10px; background: rgba(255,255,255,0.05); color: #fff; text-decoration: none; border: 1px solid var(--glass-border);">← Back to Terminal</a>
-            <a href="/logout" class="btn-primary" style="padding: 10px 20px; font-size: 0.8rem; border-radius: 10px; background: var(--bg-primary); color: var(--text-secondary); text-decoration: none;">Logout</a>
+            <a href="/faculty/dashboard" class="btn-primary"
+                style="padding: 10px 20px; font-size: 0.8rem; border-radius: 10px; background: rgba(255,255,255,0.05); color: #fff; text-decoration: none; border: 1px solid var(--glass-border);">←
+                Back to Terminal</a>
+            <a href="/logout" class="btn-primary"
+                style="padding: 10px 20px; font-size: 0.8rem; border-radius: 10px; background: var(--bg-primary); color: var(--text-secondary); text-decoration: none;">Logout</a>
         </div>
     </div>
 
@@ -28,29 +35,43 @@
             <!-- Main Column -->
             <div class="main-column">
                 <!-- Stats Row -->
-                <div class="stats-grid" style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px;">
+                <div class="stats-grid"
+                    style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 20px; margin-bottom: 30px;">
                     <div class="card" style="border-left: 3px solid var(--accent);">
                         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
-                            <div style="width: 32px; height: 32px; background: rgba(99, 102, 241, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--accent);">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path><path d="M22 12A10 10 0 0 0 12 2v10z"></path></svg>
+                            <div
+                                style="width: 32px; height: 32px; background: rgba(99, 102, 241, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--accent);">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <path d="M21.21 15.89A10 10 0 1 1 8 2.83"></path>
+                                    <path d="M22 12A10 10 0 0 0 12 2v10z"></path>
+                                </svg>
                             </div>
                             <h3 style="margin: 0; font-size: 0.65rem;">Current Status</h3>
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: flex-end;">
                             <p class="stat-value" style="font-size: 2rem; color: #fff;">{{ performance.category }}</p>
-                            <span style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--cyan);">{{ performance.weighted_score }}% WEIGHTED</span>
+                            <span style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--cyan);">{{
+                                performance.weighted_score }}% WEIGHTED</span>
                         </div>
                     </div>
                     <div class="card" style="border-left: 3px solid var(--purple);">
                         <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
-                            <div style="width: 32px; height: 32px; background: rgba(168, 85, 247, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--purple);">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline></svg>
+                            <div
+                                style="width: 32px; height: 32px; background: rgba(168, 85, 247, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--purple);">
+                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
+                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
+                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
+                                </svg>
                             </div>
                             <h3 style="margin: 0; font-size: 0.65rem;">Prediction</h3>
                         </div>
                         <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-                            <p class="stat-value" style="font-size: 2rem; color: var(--purple);">{{ prediction.score }}%</p>
-                            <span style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted);">CONFIDENCE: {{ prediction.confidence }}%</span>
+                            <p class="stat-value" style="font-size: 2rem; color: var(--purple);">{{ prediction.score }}%
+                            </p>
+                            <span
+                                style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted);">CONFIDENCE:
+                                {{ prediction.confidence }}%</span>
                         </div>
                     </div>
                 </div>
@@ -62,7 +83,8 @@
                     </div>
                 </div>
 
-                <div class="charts-row" style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
+                <div class="charts-row"
+                    style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px; margin-bottom: 30px;">
                     <div class="card chart-card">
                         <h3>Distribution</h3>
                         <div class="chart-img-wrap" style="height: 300px;">
@@ -86,17 +108,20 @@
                         {% for msg in guidance %}
                         <div class="intelligence-brief priority-{{ msg.priority | lower }}">
                             <div class="brief-header">
-                                <span class="brief-priority priority-{{ msg.priority | upper }}">{{ msg.priority }}</span>
+                                <span class="brief-priority priority-{{ msg.priority | upper }}">{{ msg.priority
+                                    }}</span>
                             </div>
                             <div class="brief-observation">{{ msg.observation }}</div>
                             <div class="brief-action">{{ msg.action }}</div>
                             <div class="brief-footer">
                                 <span>Impact: <strong style="color: #fff;">{{ msg.impact }}</strong></span>
-                                {% if msg.deadline %}<span>Target: <strong style="color: var(--cyan);">{{ msg.deadline }}</strong></span>{% endif %}
+                                {% if msg.deadline %}<span>Target: <strong style="color: var(--cyan);">{{ msg.deadline
+                                        }}</strong></span>{% endif %}
                             </div>
                         </div>
                         {% else %}
-                        <div style="text-align: center; padding: 40px; color: var(--text-muted); font-family: var(--font-mono); font-size: 0.8rem;">
+                        <div
+                            style="text-align: center; padding: 40px; color: var(--text-muted); font-family: var(--font-mono); font-size: 0.8rem;">
                             SECURE: No interventions required.
                         </div>
                         {% endfor %}
@@ -187,7 +212,7 @@
                     legend: { position: 'bottom', labels: { color: '#94a3b8' } },
                     tooltip: {
                         callbacks: {
-                            label: function(context) {
+                            label: function (context) {
                                 const isPred = context.dataIndex >= chartData.actual_scores.length;
                                 if (context.datasetIndex === 0 && isPred) return null;
                                 return (isPred ? 'Predicted: ' : 'Actual: ') + context.parsed.y + '%';
@@ -230,10 +255,10 @@
                         color: '#fff',
                         anchor: 'center',
                         align: 'center',
-                        font: { 
-                            weight: '800', 
-                            family: 'var(--font-mono)', 
-                            size: 11 
+                        font: {
+                            weight: '800',
+                            family: 'var(--font-mono)',
+                            size: 11
                         },
                         padding: 8,
                         borderRadius: 4,
@@ -294,7 +319,7 @@
                     legend: { position: 'bottom', labels: { color: '#94a3b8' } },
                     tooltip: {
                         callbacks: {
-                            label: function(context) {
+                            label: function (context) {
                                 const val = context.parsed.x;
                                 const target = context.datasetIndex === 1 ? '' : ' (Target: ' + context.chart.data.datasets[1].data[context.dataIndex] + '%)';
                                 return context.dataset.label + ': ' + val + '%' + target;
@@ -310,4 +335,5 @@
         });
     </script>
 </body>
+
 </html>

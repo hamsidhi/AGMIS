@@ -128,6 +128,8 @@ async def do_change_password(request: Request, new_password: str = Form(...)):
         
     if user["role"] == "faculty":
         url = "/faculty/dashboard"
+    elif user["role"] == "admin":
+        url = "/admin"
     else:
         url = "/student/dashboard"
     
@@ -152,33 +154,116 @@ async def admin_dashboard(request: Request):
         if not admin_row or admin_row["role"] != "admin":
             return RedirectResponse(url="/")
         admin = dict(admin_row)
-        
-        # System Stats
-        total_faculty = conn.execute("SELECT COUNT(*) FROM users WHERE role='faculty'").fetchone()[0]
-        total_students = conn.execute("SELECT COUNT(DISTINCT username) FROM users WHERE role='student'").fetchone()[0]
-        total_subjects = conn.execute("SELECT COUNT(DISTINCT subject) FROM predictions").fetchone()[0]
-        
-        faculty_list = db_service.get_faculty_list()
-        # Add subject_code to faculty list for admin view
-        for f in faculty_list:
-            f_data = conn.execute("SELECT subject_code FROM users WHERE username=?", (f["username"],)).fetchone()
-            f["subject_code"] = f_data["subject_code"] if f_data else "N/A"
 
     return templates.TemplateResponse(
         "admin_dashboard.html",
         {
             "request": request,
-            "admin": admin,
-            "stats": {
-                "faculty": total_faculty,
-                "students": total_students,
-                "subjects": total_subjects
-            },
-            "faculty_list": faculty_list,
-            "global_events": db_service.get_calendar_events(),
-            "audit_logs": db_service.get_audit_logs()
+            "admin": admin
         }
     )
+
+@app.get("/admin/api/dashboard_stats")
+async def admin_api_stats(request: Request):
+    uname = request.cookies.get("user_id")
+    with db_service.get_conn() as conn:
+        admin_row = conn.execute("SELECT * FROM users WHERE username=?", (uname,)).fetchone()
+        if not admin_row or admin_row["role"] != "admin":
+            return JSONResponse({"error": "Unauthorized"}, status_code=403)
+            
+        total_faculty = conn.execute("SELECT COUNT(*) FROM users WHERE role='faculty' AND COALESCE(is_active, 1) = 1").fetchone()[0]
+        total_students = conn.execute("SELECT COUNT(*) FROM users WHERE role='student' AND COALESCE(is_active, 1) = 1").fetchone()[0]
+        total_subjects = conn.execute("SELECT COUNT(DISTINCT subject) FROM predictions").fetchone()[0]
+        
+        distribution = {
+            "high_performer": 0,
+            "stable": 0,
+            "moderate_risk": 0,
+            "high_risk": 0
+        }
+        students_risk = conn.execute("""
+            SELECT risk_level FROM predictions p
+            JOIN users u ON u.username = p.student_id
+            WHERE u.role='student' AND COALESCE(u.is_active, 1) = 1
+        """).fetchall()
+        
+        for row in students_risk:
+            risk = row["risk_level"]
+            if risk == "Low":
+                distribution["stable"] += 1
+            elif risk == "High":
+                distribution["moderate_risk"] += 1
+            elif risk == "Critical":
+                distribution["high_risk"] += 1
+            else:
+                distribution["stable"] += 1
+
+    return {
+        "stats": {
+            "faculty": total_faculty,
+            "students": total_students,
+            "subjects": total_subjects
+        },
+        "distribution": distribution
+    }
+
+@app.get("/admin/api/students")
+async def admin_api_students(request: Request):
+    uname = request.cookies.get("user_id")
+    with db_service.get_conn() as conn:
+        admin_row = conn.execute("SELECT * FROM users WHERE username=?", (uname,)).fetchone()
+        if not admin_row or admin_row["role"] != "admin":
+            return JSONResponse({"error": "Unauthorized"}, status_code=403)
+    return db_service.get_all_students()
+
+@app.get("/admin/api/faculty")
+async def admin_api_faculty(request: Request):
+    uname = request.cookies.get("user_id")
+    with db_service.get_conn() as conn:
+        admin_row = conn.execute("SELECT * FROM users WHERE username=?", (uname,)).fetchone()
+        if not admin_row or admin_row["role"] != "admin":
+            return JSONResponse({"error": "Unauthorized"}, status_code=403)
+    return db_service.get_faculty_list()
+
+@app.get("/admin/api/messages")
+async def admin_api_messages(request: Request, subject_code: str = None, student_id: str = None, date_range_days: int = None):
+    uname = request.cookies.get("user_id")
+    with db_service.get_conn() as conn:
+        admin_row = conn.execute("SELECT * FROM users WHERE username=?", (uname,)).fetchone()
+        if not admin_row or admin_row["role"] != "admin":
+            return JSONResponse({"error": "Unauthorized"}, status_code=403)
+            
+    msgs = db_service.get_all_messages(subject_code=subject_code, student_id=student_id, date_range_days=date_range_days)
+    return msgs
+
+@app.post("/admin/delete-faculty")
+async def admin_api_delete_faculty(request: Request, username: str = Form(...)):
+    uname = request.cookies.get("user_id")
+    with db_service.get_conn() as conn:
+        admin_row = conn.execute("SELECT * FROM users WHERE username=?", (uname,)).fetchone()
+        if not admin_row or admin_row["role"] != "admin":
+            return JSONResponse({"error": "Unauthorized"}, status_code=403)
+    db_service.delete_user(username, uname)
+    return JSONResponse({"status": "success"})
+
+@app.post("/admin/update-faculty")
+async def admin_api_update_faculty(
+    request: Request,
+    username: str = Form(...),
+    name: str = Form(...),
+    subject_name: str = Form(...),
+    subject_code: str = Form(...)
+):
+    uname = request.cookies.get("user_id")
+    with db_service.get_conn() as conn:
+        admin_row = conn.execute("SELECT * FROM users WHERE username=?", (uname,)).fetchone()
+        if not admin_row or admin_row["role"] != "admin":
+            return JSONResponse({"error": "Unauthorized"}, status_code=403)
+            
+    with db_service.get_conn() as conn:
+         conn.execute("UPDATE users SET name=?, subject_name=?, subject_code=? WHERE username=?", (name, subject_name, subject_code, username))
+    db_service.add_audit_log(uname, "UPDATE_FACULTY", f"Updated faculty: {username}")
+    return JSONResponse({"status": "success"})
 
 
 @app.post("/admin/create-faculty")
@@ -198,8 +283,16 @@ async def create_faculty(
     
     with db_service.get_conn() as conn:
         conn.execute(
-            """INSERT INTO users (username, password, role, name, subject_name, subject_code, email, is_first_login)
-               VALUES (?, ?, 'faculty', ?, ?, ?, ?, 1)""",
+            """INSERT INTO users (username, password, role, name, subject_name, subject_code, email, is_first_login, is_active)
+               VALUES (?, ?, 'faculty', ?, ?, ?, ?, 1, 1)
+               ON CONFLICT(username) DO UPDATE SET
+               password=excluded.password,
+               name=excluded.name,
+               subject_name=excluded.subject_name,
+               subject_code=excluded.subject_code,
+               email=excluded.email,
+               is_first_login=1,
+               is_active=1""",
             (username, temp_password, name, subject_name, subject_code, email)
         )
     
@@ -228,6 +321,53 @@ async def reset_password(request: Request, username: str = Form(...)):
     
     admin_id = request.cookies.get("user_id")
     db_service.add_audit_log(admin_id, "RESET_PASSWORD", f"For user: {username}")
+    
+    return JSONResponse({
+        "status": "success",
+        "message": f"Password reset for {username}. New Temp Password: {temp_password}",
+        "temp_password": temp_password
+    })
+
+
+@app.post("/admin/api/student/update")
+async def admin_update_student(
+    request: Request,
+    username: str = Form(...),
+    name: str = Form(...),
+    year: str = Form(None),
+    batch: str = Form(None)
+):
+    admin_id = request.cookies.get("user_id")
+    with db_service.get_conn() as conn:
+        conn.execute("UPDATE users SET name=? WHERE username=?", (name, username))
+        conn.execute("REPLACE INTO student_profile (student_id, year, batch) VALUES (?, ?, ?)", (username, year, batch))
+    db_service.add_audit_log(admin_id, "UPDATE_STUDENT", f"Updated student profile: {username}")
+    return JSONResponse({"status": "success"})
+
+
+@app.delete("/admin/api/student/{student_id}")
+async def admin_delete_student(request: Request, student_id: str):
+    admin_id = request.cookies.get("user_id")
+    db_service.delete_user(student_id, "student")
+    db_service.add_audit_log(admin_id, "DELETE_STUDENT", f"Soft-deleted student: {student_id}")
+    return JSONResponse({"status": "success"})
+
+
+@app.post("/admin/api/student/reset-password")
+async def admin_reset_student_password(request: Request, username: str = Form(...)):
+    import secrets
+    import string
+    alphabet = string.ascii_letters + string.digits
+    temp_password = ''.join(secrets.choice(alphabet) for i in range(8))
+    
+    with db_service.get_conn() as conn:
+        conn.execute(
+            "UPDATE users SET password=?, is_first_login=1 WHERE username=? AND role='student'",
+            (temp_password, username)
+        )
+    
+    admin_id = request.cookies.get("user_id")
+    db_service.add_audit_log(admin_id, "RESET_STUDENT_PASSWORD", f"For student: {username}")
     
     return JSONResponse({
         "status": "success",
@@ -344,6 +484,7 @@ async def send_message(
     receiver_id: str = Form(None),
     subject_code: str = Form(...),
     message: str = Form(...),
+    tag: str = Form(None),
     parent_id: str = Form(None)
 ):
     sender_id = request.cookies.get("user_id")
@@ -378,11 +519,59 @@ async def send_message(
                     return JSONResponse({"status": "error", "message": f"Faculty not found for subject: {subject_code}"}, status_code=404)
                 
     try:
-        db_service.send_message(sender_id, receiver_id, subject_code, message, p_id)
+        db_service.send_message(sender_id, receiver_id, subject_code, message, tag=tag, parent_id=p_id)
+        
+        # Burnout Intelligence / Stress Signal
+        if sender_id:
+            user = db_service.get_user(sender_id)
+            if user and user.get("role") == "student":
+                keywords = ["confused", "fail", "understand", "stress", "anxious", "worried", "stuck", "overwhelmed"]
+                has_keywords = any(kw in message.lower() for kw in keywords)
+                
+                with db_service.get_conn() as conn:
+                    recent = conn.execute("SELECT COUNT(*) as c FROM messages WHERE sender_id=? AND sent_at > datetime('now', '-3 days')", (sender_id,)).fetchone()
+                    msg_count = recent["c"] if recent else 0
+                
+                # If high frequency (>=5 in 3 days) or explicitly using stress keywords
+                if has_keywords or msg_count >= 5:
+                    alert_msg = f"Elevated Academic Stress Detected for {user['name']}. Multiple doubts or stress-related keywords used recently."
+                    # Add alert for faculty
+                    db_service.add_notif(None, alert_msg, subject_code=subject_code, n_type='alert')
+                    # System note to the student acknowledging their struggle
+                    db_service.add_notif(sender_id, "We noticed you've been working hard and might be feeling stressed. Don't hesitate to reach out for direct academic support.", subject_code=None, n_type='system')
+
         return {"status": "success"}
     except Exception as e:
         print(f"Error sending message: {e}")
         return JSONResponse({"status": "error", "message": str(e)}, status_code=500)
+
+@app.post("/api/messages/summarize")
+async def summarize_messages(request: Request, subject_code: str = Form(...), other_id: str = Form(None)):
+    user_id = request.cookies.get("user_id")
+    if not user_id: return JSONResponse({"status": "error"}, status_code=401)
+    
+    with db_service.get_conn() as conn:
+        user = conn.execute("SELECT role FROM users WHERE username=?", (user_id,)).fetchone()
+        role = user["role"] if user else None
+        
+    msgs = db_service.get_messages(user_id, role=role, other_id=other_id, subject_code=subject_code)
+    
+    if len(msgs) == 0:
+        return {"status": "success", "summary": "No messages to summarize."}
+        
+    # Heuristic summary
+    tags = list(set([m.get("tag") for m in msgs if m.get("tag")]))
+    tag_str = ", ".join(tags) if tags else "various topics"
+    
+    # Just grab the last few messages for context
+    lines = []
+    for m in reversed(msgs[:5]): # oldest first of the last 5
+        sender = "Student" if str(m["sender_id"]) == str(other_id) else "Faculty/You"
+        lines.append(f"{sender}: {m['message'][:50]}...")
+        
+    summary_text = f"Discussion primarily centered around {tag_str}. There were {len(msgs)} total messages in this thread.\n\nRecent context:\n" + "\n".join(lines)
+    
+    return {"status": "success", "summary": summary_text}
 
 # ---------- Faculty dashboard (single route) ----------
 @app.get("/faculty/dashboard", response_class=HTMLResponse)
@@ -417,6 +606,19 @@ async def faculty_dash(request: Request, year: int | None = None, batch: str | N
         materials = db_service.get_materials(faculty["subject_code"])
         events = db_service.get_calendar_events(faculty["subject_code"])
         messages = db_service.get_messages(uname, role='faculty', subject_code=faculty["subject_code"])
+        
+        # Populate sender names for the chat UI
+        for m in messages:
+            for field in ("sender_id", "receiver_id"):
+                val = m.get(field)
+                if val and str(val) != str(uname):
+                    u_row = db_service.get_user(val)
+                    m[field.replace("_id", "_name")] = u_row["name"] if u_row else val
+                elif str(val) == str(uname):
+                    m[field.replace("_id", "_name")] = "You"
+                else:
+                    m[field.replace("_id", "_name")] = "System/Global"
+                    
         notifications = db_service.get_notifications(subject_codes=[faculty["subject_code"]])
 
     total = len(students)
@@ -521,7 +723,18 @@ async def upload(request: Request, year: int = Form(...), batch: str = Form(...)
         except (KeyError, TypeError, ValueError) as e:
             return JSONResponse({"status": "error", "message": f"Invalid row (student_id={s_id}): {e}"}, status_code=400)
         w = db_service.get_weights_for_subject(subj) or {"subject": subj, "w_lec": 0.20, "w_prac": 0.10, "w_assign": 0.10, "w_internal": 0.20, "w_external": 0.40}
-        pred = predict_service.predict_subject_score(metrics, weights=w)
+        
+        hist_records = db_service.get_historical_records(s_id, subj)
+        hist_scores = []
+        for hr in hist_records:
+            hr_metrics = [hr["lec_pct"] or 0, hr["prac_pct"] or 0, hr["assign_pct"] or 0, hr["internal"] or 0, hr["external"] or 0, hr["prac_marks"] or 0]
+            hist_scores.append(predict_service.calculate_base_score(hr_metrics, w))
+            
+        with db_service.get_conn() as conn_d:
+            d_row = conn_d.execute("SELECT COUNT(*) as c FROM messages WHERE sender_id=? AND subject_code=? AND tag IS NOT NULL", (s_id, faculty["subject_code"])).fetchone()
+            doubt_intensity = d_row["c"] if d_row else 0
+            
+        pred = predict_service.predict_subject_score(metrics, weights=w, historical_scores=hist_scores, doubt_intensity=doubt_intensity)
         
         # This will create/update the user with role='student' and is_first_login=1
         db_service.save_faculty_data(s_id, name, subj, week, metrics, pred)
@@ -572,6 +785,103 @@ async def upload(request: Request, year: int = Form(...), batch: str = Form(...)
         "status": "success",
         "message": f"Uploaded {count} records.",
         "credentials_file": csv_filename,
+    })
+
+
+@app.post("/faculty/student/manual-entry")
+async def add_or_update_student(
+    request: Request,
+    student_id: str = Form(...),
+    name: str = Form(...),
+    week: int = Form(...),
+    lec_pct: float = Form(0.0),
+    prac_pct: float = Form(0.0),
+    assign_pct: float = Form(0.0),
+    internal: float = Form(0.0),
+    external: float = Form(0.0),
+    prac_marks: float = Form(0.0)
+):
+    uname = request.cookies.get("user_id")
+    with db_service.get_conn() as conn:
+        faculty = conn.execute("SELECT * FROM users WHERE username=?", (uname,)).fetchone()
+    if not faculty or faculty["role"] != "faculty":
+        return JSONResponse({"status": "error", "message": "Unauthorized"}, status_code=401)
+    
+    subj = faculty["subject_name"]
+    metrics = [lec_pct, prac_pct, assign_pct, internal, external, prac_marks]
+    w = db_service.get_weights_for_subject(subj) or {"subject": subj, "w_lec": 0.20, "w_prac": 0.10, "w_assign": 0.10, "w_internal": 0.20, "w_external": 0.40}
+    
+    hist_records = db_service.get_historical_records(student_id, subj)
+    hist_scores = []
+    for hr in hist_records:
+        hr_metrics = [hr["lec_pct"] or 0, hr["prac_pct"] or 0, hr["assign_pct"] or 0, hr["internal"] or 0, hr["external"] or 0, hr["prac_marks"] or 0]
+        hist_scores.append(predict_service.calculate_base_score(hr_metrics, w))
+        
+    with db_service.get_conn() as conn_d:
+        d_row = conn_d.execute("SELECT COUNT(*) as c FROM messages WHERE sender_id=? AND subject_code=? AND tag IS NOT NULL", (student_id, faculty["subject_code"])).fetchone()
+        doubt_intensity = d_row["c"] if d_row else 0
+        
+    pred = predict_service.predict_subject_score(metrics, weights=w, historical_scores=hist_scores, doubt_intensity=doubt_intensity)
+    
+    db_service.save_faculty_data(student_id, name, subj, week, metrics, pred)
+    # Give a default batch/year to allow it to show up on dashboard unfiltered
+    try:
+        db_service.set_student_profile(student_id, 1, "A")
+    except: pass
+    
+    db_service.add_audit_log(uname, "MANUAL_STUDENT_ENTRY", f"Student: {student_id}")
+    return JSONResponse({"status": "success", "message": "Student data saved successfully."})
+
+
+@app.delete("/faculty/student/{student_id}")
+async def delete_student(request: Request, student_id: str):
+    uname = request.cookies.get("user_id")
+    with db_service.get_conn() as conn:
+        faculty = conn.execute("SELECT * FROM users WHERE username=?", (uname,)).fetchone()
+    if not faculty or faculty["role"] != "faculty":
+        return JSONResponse({"status": "error", "message": "Unauthorized"}, status_code=401)
+        
+    subj = faculty["subject_name"]
+    with db_service.get_conn() as conn:
+        conn.execute("DELETE FROM records WHERE student_id=? AND subject=?", (student_id, subj))
+        conn.execute("DELETE FROM predictions WHERE student_id=? AND subject=?", (student_id, subj))
+        
+    db_service.add_audit_log(uname, "DELETE_STUDENT", f"Student: {student_id}")
+    return JSONResponse({"status": "success", "message": "Student deleted."})
+
+
+@app.post("/faculty/student/reset-password")
+async def faculty_reset_student_password(request: Request, student_id: str = Form(...)):
+    uname = request.cookies.get("user_id")
+    with db_service.get_conn() as conn:
+        faculty = conn.execute("SELECT * FROM users WHERE username=?", (uname,)).fetchone()
+    if not faculty or faculty["role"] != "faculty":
+        return JSONResponse({"status": "error", "message": "Unauthorized"}, status_code=401)
+        
+    subj = faculty["subject_name"]
+    # Verify student belongs to this faculty's subject
+    with db_service.get_conn() as conn:
+        record = conn.execute("SELECT * FROM predictions WHERE student_id=? AND subject=?", (student_id, subj)).fetchone()
+        if not record:
+            return JSONResponse({"status": "error", "message": "Student not found in your subject"}, status_code=404)
+            
+    import secrets
+    import string
+    alphabet = string.ascii_letters + string.digits
+    temp_password = ''.join(secrets.choice(alphabet) for i in range(8))
+    
+    with db_service.get_conn() as conn:
+        conn.execute(
+            "UPDATE users SET password=?, is_first_login=1 WHERE username=? AND role='student'",
+            (temp_password, student_id)
+        )
+        
+    db_service.add_audit_log(uname, "FACULTY_RESET_STUDENT_PASSWORD", f"For student: {student_id}")
+    
+    return JSONResponse({
+        "status": "success",
+        "message": f"Password reset for {student_id}. New Temp Password: {temp_password}",
+        "temp_password": temp_password
     })
 
 
@@ -694,8 +1004,15 @@ async def faculty_student_view(request: Request, student_id: str):
     
     pred_score = round(last_pred["score"], 1) if last_pred else 0
     if weeks:
-        trend_weeks = [f"W{w}" for w in weeks] + [f"W{weeks[-1] + 1}(P)"]
-        predicted_path = actual_scores + [pred_score]
+        last_w = weeks[-1]
+        trend_weeks = [f"W{w}" for w in weeks] + [f"W{last_w + i}(P)" for i in range(1, 5)]
+        
+        last_actual = actual_scores[-1] if actual_scores else 0
+        diff = pred_score - last_actual
+        smooth_steps = [0.4, 0.7, 0.9, 1.0]
+        future_path = [round(last_actual + diff * step, 1) for step in smooth_steps]
+        
+        predicted_path = actual_scores + future_path
     else:
         trend_weeks = ["Current", "Predicted"]
         actual_scores = [weighted_score]
@@ -780,9 +1097,21 @@ async def download_template(subject_code: str):
 
 # ---------- Student dashboard ----------
 @app.get("/student/dashboard", response_class=HTMLResponse)
-async def student_dash(request: Request, subject_idx: int | None = None):
-    s_id = request.cookies.get("user_id")
+@app.get("/admin/student/{student_id}", response_class=HTMLResponse)
+async def student_dash(request: Request, subject_idx: int | None = None, student_id: str = None):
+    uname = request.cookies.get("user_id")
+    if not uname:
+        return RedirectResponse(url="/")
+        
     with db_service.get_conn() as conn:
+        viewer = conn.execute("SELECT * FROM users WHERE username=?", (uname,)).fetchone()
+        if not viewer or viewer["role"] not in ["student", "admin"]:
+            return RedirectResponse(url="/")
+            
+        role = viewer["role"]
+        is_admin = (role == "admin")
+        s_id = student_id if (is_admin and student_id) else uname
+        
         user_row = conn.execute("SELECT * FROM users WHERE username=?", (s_id,)).fetchone()
         if not user_row or user_row["role"] != "student":
             return RedirectResponse(url="/")
@@ -810,6 +1139,14 @@ async def student_dash(request: Request, subject_idx: int | None = None):
         events = db_service.get_calendar_events(include_global=True)
         materials = db_service.get_materials() 
         messages = db_service.get_messages(s_id, role='student')
+        
+        with db_service.get_conn() as conn_map:
+            code_map = conn_map.execute("SELECT subject_code, subject_name FROM users WHERE role='faculty'").fetchall()
+            code_to_name = {r["subject_code"]: r["subject_name"] for r in code_map if r["subject_code"]}
+            
+        for m in messages:
+            if m["subject_code"] and m["subject_code"] != 'GLOBAL':
+                m["subject_code"] = code_to_name.get(m["subject_code"], m["subject_code"])
 
         records = conn.execute(
             "SELECT * FROM records WHERE student_id=? ORDER BY week",
@@ -826,6 +1163,7 @@ async def student_dash(request: Request, subject_idx: int | None = None):
             "student_dashboard.html",
             {
                 "request": request,
+                "is_admin": is_admin,
                 "user": {"name": user["name"], "batch": "—", "department": "—"},
                 "overall": None,
                 "subjects": [],
@@ -847,17 +1185,17 @@ async def student_dash(request: Request, subject_idx: int | None = None):
     subjects = {}
     for r in records:
         key = r.get("subject") or "Overall"
-        if key == "Unknown": continue # Skip legacy unknown subjects
+        if key in ("Unknown", "Overall"): continue # Clean architecture: filter out legacy mock subjects
         subjects.setdefault(key, {"records": [], "preds": [], "notifs": []})
         subjects[key]["records"].append(r)
     for p in preds:
         key = p.get("subject") or "Overall"
-        if key == "Unknown": continue
+        if key in ("Unknown", "Overall"): continue
         subjects.setdefault(key, {"records": [], "preds": [], "notifs": []})
         subjects[key]["preds"].append(p)
     for n in notifs:
         key = n.get("subject") or "Overall"
-        if key == "Unknown": continue
+        if key in ("Unknown", "Overall"): continue
         subjects.setdefault(key, {"records": [], "preds": [], "notifs": []})
         subjects[key]["notifs"].append(n)
 
@@ -948,8 +1286,15 @@ async def student_dash(request: Request, subject_idx: int | None = None):
             actual_scores.append(round(sc, 1))
         pred_score = round(last_pred["score"], 1) if last_pred else 0
         if weeks:
-            trend_weeks = [f"W{w}" for w in weeks] + [f"W{weeks[-1] + 1}(P)"]
-            predicted_path = actual_scores + [pred_score]
+            last_w = weeks[-1]
+            trend_weeks = [f"W{w}" for w in weeks] + [f"W{last_w + i}(P)" for i in range(1, 5)]
+            
+            last_actual = actual_scores[-1] if actual_scores else 0
+            diff = pred_score - last_actual
+            smooth_steps = [0.4, 0.7, 0.9, 1.0]
+            future_path = [round(last_actual + diff * step, 1) for step in smooth_steps]
+            
+            predicted_path = actual_scores + future_path
         else:
             trend_weeks = ["Current", "Predicted"]
             actual_scores = [weighted_score]
@@ -975,6 +1320,34 @@ async def student_dash(request: Request, subject_idx: int | None = None):
         all_guidance.extend(guidance)
 
     overall_score = round(sum(overall_scores) / len(overall_scores), 1) if overall_scores else 0
+
+    if not subject_cards:
+        empty_performance = {"category": "Average", "weighted_score": 0}
+        empty_prediction = {"score": 0, "mae": 0, "confidence": 0, "expected_cat": "—"}
+        return templates.TemplateResponse(
+            "student_dashboard.html",
+            {
+                "request": request,
+                "user": {"name": user["name"], "batch": "—", "department": "—"},
+                "overall": None,
+                "subjects": [],
+                "subject_idx": None,
+                "notifs": [],
+                "performance": empty_performance,
+                "prediction": empty_prediction,
+                "guidance": [],
+                "chart_data": {
+                    "trend_weeks": [],
+                    "actual_scores": [],
+                    "predicted_path": [],
+                    "metrics": [0,0,0]
+                },
+                "materials": materials,
+                "events": events,
+                "messages": messages,
+                "notifications": notifications,
+            },
+        )
 
     if subject_idx is not None and 0 <= subject_idx < len(subject_cards):
         main_card = subject_cards[subject_idx]
@@ -1028,12 +1401,14 @@ async def student_dash(request: Request, subject_idx: int | None = None):
         filtered_notifications = [n for n in notifications if n["subject_code"] == current_subj_code or n["subject_code"] is None]
         filtered_events = [e for e in events if e["subject_code"] == current_subj_code or e["subject_code"] is None]
         filtered_materials = [m for m in materials if m["subject_code"] == current_subj_code]
-        filtered_messages = [m for m in messages if m["subject_code"] == current_subj_code or m["subject_code"] == "GLOBAL"]
+        
+    filtered_messages = messages
 
     return templates.TemplateResponse(
         "student_dashboard.html",
         {
             "request": request,
+            "is_admin": is_admin,
             "user": {"name": user["name"], "batch": "—", "department": "—"},
             "overall": {"score": overall_score},
             "subjects": subject_cards,

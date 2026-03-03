@@ -1,252 +1,762 @@
 <!DOCTYPE html>
 <html lang="en">
+
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>AGMIS - Admin Command Center</title>
+    <title>AGMIS - Institutional Risk Console</title>
     <link rel="stylesheet" href="/static/style.css">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;500;600;700&display=swap"
+        rel="stylesheet">
+    <!-- Chart.js for Intellgence Graph -->
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+    <style>
+        .tabs {
+            display: flex;
+            gap: 10px;
+            margin-bottom: 20px;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            padding-bottom: 10px;
+        }
+
+        .tab {
+            padding: 10px 20px;
+            cursor: pointer;
+            color: var(--text-muted);
+            font-weight: 500;
+            font-size: 0.85rem;
+            border-radius: 8px;
+            transition: all 0.3s ease;
+            font-family: var(--font-mono);
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .tab:hover {
+            background: rgba(255, 255, 255, 0.05);
+            color: #fff;
+        }
+
+        .tab.active {
+            background: rgba(34, 211, 238, 0.1);
+            color: var(--cyan);
+            border: 1px solid rgba(34, 211, 238, 0.3);
+        }
+
+        .tab-content {
+            display: none;
+            animation: fadeIn 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .tab-content.active {
+            display: block;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateY(10px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .chart-container {
+            position: relative;
+            height: 350px;
+            width: 100%;
+            transition: transform 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .chart-container:hover {
+            transform: scale(1.02);
+        }
+
+        .badge {
+            padding: 4px 8px;
+            border-radius: 4px;
+            font-size: 0.65rem;
+            font-weight: 700;
+            text-transform: uppercase;
+            border: 1px solid transparent;
+        }
+
+        .badge-critical {
+            background: rgba(239, 68, 68, 0.1);
+            border-color: rgba(239, 68, 68, 0.3);
+            color: #ef4444;
+        }
+
+        .badge-high {
+            background: rgba(245, 158, 11, 0.1);
+            border-color: rgba(245, 158, 11, 0.3);
+            color: #f59e0b;
+        }
+
+        .badge-low {
+            background: rgba(34, 197, 94, 0.1);
+            border-color: rgba(34, 197, 94, 0.3);
+            color: #22c55e;
+        }
+
+        .badge-neutral {
+            background: rgba(255, 255, 255, 0.05);
+            border-color: rgba(255, 255, 255, 0.2);
+            color: var(--text-muted);
+        }
+
+        .burnout-icon {
+            color: #ef4444;
+            font-weight: bold;
+            margin-left: 6px;
+            cursor: help;
+            font-size: 0.9rem;
+        }
+
+        .action-icon {
+            background: transparent;
+            border: none;
+            color: var(--cyan);
+            cursor: pointer;
+            font-size: 0.8rem;
+            text-decoration: underline;
+            padding: 4px;
+        }
+
+        .action-icon.danger {
+            color: #ef4444;
+        }
+    </style>
 </head>
+
 <body class="faculty-dashboard">
     <div class="page-header">
         <div class="header-left">
             <div class="logo-wrap" style="margin-right: 15px;">
-                <img src="/static/logo.png" alt="AGMIS Logo" style="height: 40px; width: auto; filter: drop-shadow(0 0 10px var(--accent-glow));">
+                <img src="/static/logo.png" alt="AGMIS Logo"
+                    style="height: 40px; width: auto; filter: drop-shadow(0 0 10px var(--accent-glow));">
             </div>
             <div class="user-info">
-                <h1>AGMIS System Command</h1>
-                <span class="batch-tag">Terminal#2-510 | Root Access | Global Control</span>
+                <h1>Inst. Risk Monitoring Console</h1>
+                <span class="batch-tag">Admin Root Access | Global Visibility</span>
             </div>
         </div>
         <div class="actions">
-            <button class="btn-primary" style="padding: 10px 20px; font-size: 0.8rem; border-radius: 10px;" onclick="document.getElementById('facultyModal').style.display='flex'">Create Faculty Account</button>
-            <a href="/logout" class="btn-primary" style="padding: 10px 20px; font-size: 0.8rem; border-radius: 10px; background: var(--bg-primary); color: var(--text-secondary);">Logout</a>
+            <!-- Global Actions specific to the viewed tab could go here, for now just Logout -->
+            <a href="/logout" class="btn-primary"
+                style="padding: 10px 20px; font-size: 0.8rem; border-radius: 10px; background: var(--bg-primary); color: var(--text-secondary);">Disconnect</a>
         </div>
     </div>
 
     <div class="container">
-        <!-- Global Overview Stats -->
-        <div class="stats-grid" style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px;">
-            <div class="card stat-card-mini" style="padding: 20px; border-left: 3px solid var(--cyan);">
-                <div style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase;">Total Faculty</div>
-                <div style="font-size: 1.8rem; font-weight: 900; color: var(--cyan);">{{ stats.faculty }}</div>
+        <!-- Intelligent Tab Navigation -->
+        <div class="tabs">
+            <div class="tab active" onclick="switchTab('overview')">System Overview</div>
+            <div class="tab" onclick="switchTab('students')">Student Intelligence</div>
+            <div class="tab" onclick="switchTab('faculty')">Faculty Evaluation</div>
+            <div class="tab" onclick="switchTab('chat')">Chat Intelligence</div>
+            <div class="tab" style="opacity: 0.4; cursor: not-allowed;" title="Part of Phase 3">Audit & Cal (Ph 3)</div>
+        </div>
+
+        <!-- 1. System Overview Tab -->
+        <div id="tab-overview" class="tab-content active">
+            <div
+                style="margin-bottom: 30px; border-bottom: 2px solid #8B4513; padding-bottom: 15px; display: flex; justify-content: space-between; align-items: flex-end;">
+                <div>
+                    <h2
+                        style="font-family: 'Courier New', Courier, monospace; color: #B22222; margin: 0 0 5px 0; font-size: 2.2rem; text-transform: uppercase; letter-spacing: 2px;">
+                        Global Threat Matrix</h2>
+                    <div style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">
+                        CLASSIFICATION: TOP SECRET // ADMIN EYES ONLY</div>
+                </div>
+                <div
+                    style="text-align: right; font-family: var(--font-mono); font-size: 0.7rem; color: #228B22; font-weight: bold;">
+                    SYSTEM SECURE<br>ENCRYPTION ACTIVE
+                </div>
             </div>
-            <div class="card stat-card-mini" style="padding: 20px; border-left: 3px solid var(--accent);">
-                <div style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase;">Total Students</div>
-                <div style="font-size: 1.8rem; font-weight: 900; color: var(--accent);">{{ stats.students }}</div>
+
+            <div class="stats-grid"
+                style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px;"
+                id="overview-stats">
+                <div style="padding: 20px; text-align: center; color: var(--text-muted);">Initializing Uplink...</div>
             </div>
-            <div class="card stat-card-mini" style="padding: 20px; border-left: 3px solid var(--success);">
-                <div style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase;">Subjects Monitored</div>
-                <div style="font-size: 1.8rem; font-weight: 900; color: var(--success);">{{ stats.subjects }}</div>
+
+            <div class="card"
+                style="border: 2px solid rgba(139, 69, 19, 0.3); background: #FCF5E5; box-shadow: 6px 6px 0px rgba(139, 69, 19, 0.1);">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <div>
+                        <h3
+                            style="margin: 0; color: var(--text-primary); font-size: 1.1rem; border-bottom: 1px dashed rgba(139, 69, 19, 0.3); padding-bottom: 5px; display: inline-block;">
+                            Institutional Risk Distribution</h3>
+                        <div
+                            style="font-size: 0.7rem; color: var(--text-muted); margin-top: 8px; font-family: var(--font-mono);">
+                            > Aggregating live predictive models across all sectors</div>
+                    </div>
+                </div>
+                <div class="chart-img-wrap"
+                    style="background: rgba(139, 69, 19, 0.02); border: 1px inset rgba(139, 69, 19, 0.1);">
+                    <canvas id="riskChart"></canvas>
+                </div>
             </div>
         </div>
 
-        <div class="dashboard-grid" style="grid-template-columns: 1fr;">
+        <!-- 2. Student Intelligence Tab -->
+        <div id="tab-students" class="tab-content">
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                    <h3 style="margin: 0;">Faculty Control Panel</h3>
-                    <span style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted);">{{ faculty_list|length }} ACCOUNTS ACTIVE</span>
-                </div>
-                
-                <div class="table-scroll">
-                    <table class="styled-table">
-                        <thead>
-                            <tr>
-                                <th>Name / Username</th>
-                                <th>Assigned Subject</th>
-                                <th>Contact</th>
-                                <th>Security</th>
-                                <th>Operations</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            {% for f in faculty_list %}
-                            <tr>
-                                <td>
-                                    <div style="font-weight: 800; color: #fff;">{{ f.name }}</div>
-                                    <div style="font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono);">{{ f.username }}</div>
-                                </td>
-                                <td>
-                                    <div style="font-weight: 600;">{{ f.subject_name }}</div>
-                                    <div style="font-size: 0.65rem; color: var(--cyan); font-family: var(--font-mono);">CODE: {{ f.subject_code }}</div>
-                                </td>
-                                <td style="font-family: var(--font-mono); font-size: 0.8rem;">{{ f.email or 'N/A' }}</td>
-                                <td>
-                                    <span class="status-tag" style="background: rgba(34, 211, 238, 0.05); color: var(--cyan); border: 1px solid rgba(34, 211, 238, 0.2); font-size: 0.6rem;">ACTIVE</span>
-                                </td>
-                                <td>
-                                    <button class="btn-primary" style="padding: 6px 12px; font-size: 0.65rem; background: rgba(255,255,255,0.05); border: 1px solid var(--glass-border);" onclick="resetPassword('{{ f.username }}')">Reset PIN</button>
-                                </td>
-                            </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Global Calendar CRUD -->
-            <div class="card">
-                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                    <h3 style="margin: 0;">System-wide Calendar (Holidays/Global Events)</h3>
-                    <button class="btn-primary" style="font-size: 0.7rem; padding: 5px 10px;" onclick="openGlobalEventModal()">Add Global Event</button>
+                    <h3 style="margin: 0;">Global Student Monitoring</h3>
+                    <span style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted);"
+                        id="student-count">...</span>
                 </div>
                 <div class="table-scroll">
                     <table class="styled-table">
                         <thead>
                             <tr>
-                                <th>Event</th>
-                                <th>Date</th>
-                                <th>Type</th>
+                                <th>Student Identity</th>
+                                <th>Cohort (Yr/Batch)</th>
+                                <th>Primary Risk Level</th>
+                                <th>Predictive Confidence</th>
                                 <th>Action</th>
                             </tr>
                         </thead>
-                        <tbody id="globalEventTable">
-                            {% for e in global_events %}
+                        <tbody id="student-tbody">
                             <tr>
-                                <td>{{ e.title }}</td>
-                                <td style="font-family: var(--font-mono);">{{ e.event_date }}</td>
-                                <td><span class="status-tag">{{ e.event_type }}</span></td>
-                                <td><button onclick="deleteEvent('{{ e.id }}')" style="background: transparent; border: none; color: var(--danger); cursor: pointer;">Delete</button></td>
+                                <td colspan="5" style="text-align: center; color: var(--text-muted);">Fetching
+                                    intelligence...</td>
                             </tr>
-                            {% endfor %}
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Audit Logs -->
-            <div class="card">
-                <h3>System Audit Logs</h3>
-                <div class="table-scroll" style="max-height: 400px;">
-                    <table class="styled-table" id="auditLogTable">
-                        <thead>
-                            <tr>
-                                <th>User</th>
-                                <th>Action</th>
-                                <th>Details</th>
-                                <th>Time</th>
-                            </tr>
-                        </thead>
-                        <tbody id="auditLogTableBody">
-                            {% for log in audit_logs %}
-                            <tr>
-                                <td style="font-family: var(--font-mono); font-size: 0.7rem;">{{ log.user_id }}</td>
-                                <td><span class="status-tag" style="font-size: 0.6rem;">{{ log.action }}</span></td>
-                                <td style="font-size: 0.75rem; color: var(--text-muted);">{{ log.details }}</td>
-                                <td style="font-family: var(--font-mono); font-size: 0.65rem;">{{ log.timestamp }}</td>
-                            </tr>
-                            {% endfor %}
                         </tbody>
                     </table>
                 </div>
             </div>
         </div>
+
+        <!-- 3. Faculty Evaluation Tab -->
+        <div id="tab-faculty" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <h3 style="margin: 0;">Faculty Performance Matrix</h3>
+                    <button class="btn-primary" style="font-size: 0.7rem; padding: 6px 15px;"
+                        onclick="openFacultyModal()">Deploy New Faculty</button>
+                </div>
+                <div class="table-scroll">
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>Faculty Member</th>
+                                <th>Subject Domain</th>
+                                <th>Active Caseload</th>
+                                <th>Class Risk Profile</th>
+                                <th>Doubt Volume Handled</th>
+                                <th>System Ops</th>
+                            </tr>
+                        </thead>
+                        <tbody id="faculty-tbody">
+                            <tr>
+                                <td colspan="6" style="text-align: center; color: var(--text-muted);">Analyzing faculty
+                                    metrics...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+        <!-- 4. Chat Intelligence Tab -->
+        <div id="tab-chat" class="tab-content">
+            <div class="card">
+                <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
+                    <h3 style="margin: 0;">Communication Visibility Core</h3>
+
+                    <div style="display: flex; gap: 10px;">
+                        <input type="text" id="chatFilterStudent" placeholder="Student ID" class="input-field"
+                            style="width: 150px; padding: 6px 12px; margin: 0;">
+                        <input type="text" id="chatFilterSubject" placeholder="Subject Code" class="input-field"
+                            style="width: 150px; padding: 6px 12px; margin: 0;">
+                        <select id="chatFilterDays" class="input-field"
+                            style="width: 120px; padding: 6px 12px; margin: 0;">
+                            <option value="">Any Time</option>
+                            <option value="1">Last 24 Hrs</option>
+                            <option value="7" selected>Last 7 Days</option>
+                            <option value="30">Last 30 Days</option>
+                        </select>
+                        <button class="btn-primary" style="padding: 6px 15px; font-size: 0.75rem;"
+                            onclick="loadChat(true)">Apply Intel Filters</button>
+                    </div>
+                </div>
+
+                <div class="table-scroll" style="max-height: 500px;">
+                    <table class="styled-table">
+                        <thead>
+                            <tr>
+                                <th>Subject Domain</th>
+                                <th>Sender (Risk Profile)</th>
+                                <th style="width: 40%">Encrypted Payload (Message)</th>
+                                <th>Recipient</th>
+                                <th>Timestamp</th>
+                            </tr>
+                        </thead>
+                        <tbody id="chat-tbody">
+                            <tr>
+                                <td colspan="5" style="text-align: center; color: var(--text-muted);">Initializing
+                                    surveillance...</td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
     </div>
 
-    <!-- Global Event Modal -->
-    <div id="globalEventModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+    <!-- Faculty Creation/Update Modal -->
+    <div id="facultyModal"
+        style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
         <div class="card" style="width: 100%; max-width: 500px; padding: 40px;">
-            <h2 style="margin-top: 0; margin-bottom: 20px;">Add System Event</h2>
-            <form id="globalEventForm" class="login-form">
-                <input type="text" name="title" placeholder="Event Title" class="input-field" required>
-                <textarea name="description" placeholder="Description" class="input-field" style="min-height: 100px; resize: none;"></textarea>
-                <input type="date" name="event_date" class="input-field" required>
-                <select name="event_type" class="input-field" style="background: var(--bg-primary); border: 1px solid var(--glass-border); color: #fff; padding: 12px;">
-                    <option value="holiday">System Holiday</option>
-                    <option value="deadline">Global Deadline</option>
-                    <option value="event">Academic Event</option>
-                </select>
-                
+            <h2 id="facultyModalTitle" style="margin-top: 0; margin-bottom: 20px;">Deploy New Faculty</h2>
+            <form id="facultyForm" class="login-form">
+                <!-- Hidden field for action mode (create vs update) -->
+                <input type="hidden" id="facMode" value="create">
+
+                <input type="text" id="facUser" name="username" placeholder="Username (Unique ID)" class="input-field"
+                    required>
+                <input type="text" id="facName" name="name" placeholder="Full Display Name" class="input-field"
+                    required>
+                <input type="text" id="facSubName" name="subject_name"
+                    placeholder="Subject Domain (e.g. Machine Learning)" class="input-field" required>
+                <input type="text" id="facSubCode" name="subject_code" placeholder="Subject Code (e.g. CS-ML-501)"
+                    class="input-field" required>
+                <input type="email" id="facEmail" name="email" placeholder="Contact Email" class="input-field"
+                    id="facEmailInput">
+
                 <div style="display: flex; gap: 15px; margin-top: 20px;">
-                    <button type="submit" class="btn-login" style="flex: 2; margin: 0;">Add Event</button>
-                    <button type="button" class="btn-primary" style="flex: 1; background: var(--bg-primary); color: var(--text-secondary); border: 1px solid var(--glass-border);" onclick="closeGlobalEventModal()">Cancel</button>
+                    <button type="submit" class="btn-login" style="flex: 2; margin: 0;" id="facSubmitBtn">Initialize
+                        Account</button>
+                    <button type="button" class="btn-primary" id="facResetPassBtn"
+                        style="display: none; flex: 1; background: #8B0000; color: #fff; border: 2px solid #8B4513;"
+                        onclick="resetFacultyPasswordAdmin()">Reset Password</button>
+                    <button type="button" class="btn-primary"
+                        style="flex: 1; background: var(--bg-primary); color: var(--text-secondary); border: 1px solid var(--glass-border);"
+                        onclick="closeFacultyModal()">Abort</button>
                 </div>
             </form>
         </div>
     </div>
 
-    <!-- Create Faculty Modal -->
-    <div id="facultyModal" style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
-        <div class="card" style="width: 100%; max-width: 500px; padding: 40px;">
-            <h2 style="margin-top: 0; margin-bottom: 20px;">Register New Faculty</h2>
-            <form id="createFacultyForm" class="login-form">
-                <input type="text" name="username" placeholder="Username (e.g. jsmith)" class="input-field" required>
-                <input type="text" name="name" placeholder="Full Display Name" class="input-field" required>
-                <input type="text" name="subject_name" placeholder="Subject Name (e.g. Machine Learning)" class="input-field" required>
-                <input type="text" name="subject_code" placeholder="Subject Code (e.g. CS-ML-501)" class="input-field" required>
-                <input type="email" name="email" placeholder="Email Address" class="input-field">
-                
+    <!-- Student Edit Modal -->
+    <div id="studentEditModal"
+        style="display: none; position: fixed; inset: 0; background: rgba(0,0,0,0.8); z-index: 1000; align-items: center; justify-content: center; backdrop-filter: blur(8px);">
+        <div class="card"
+            style="width: 100%; max-width: 500px; padding: 40px; border: 2px solid rgba(139, 69, 19, 0.4); background: #FCF5E5; box-shadow: 6px 6px 0px rgba(139, 69, 19, 0.2);">
+            <h2
+                style="margin-top: 0; margin-bottom: 20px; color: #B22222; font-family: 'Courier New', Courier, monospace;">
+                Update Student Dossier</h2>
+            <form id="studentEditForm" class="login-form">
+                <input type="text" id="editStudentUsername" name="username" class="input-field" readonly
+                    style="background: rgba(0,0,0,0.05); color: var(--text-muted); cursor: not-allowed;">
+                <input type="text" id="editStudentName" name="name" placeholder="Full Name" class="input-field"
+                    required>
+                <input type="text" id="editStudentYear" name="year" placeholder="Year (e.g. FY, SY, TY, BTech)"
+                    class="input-field">
+                <input type="text" id="editStudentBatch" name="batch" placeholder="Batch (e.g. A, B, C)"
+                    class="input-field">
+
                 <div style="display: flex; gap: 15px; margin-top: 20px;">
-                    <button type="submit" class="btn-login" style="flex: 2; margin: 0;">Create Account</button>
-                    <button type="button" class="btn-primary" style="flex: 1; background: var(--bg-primary); color: var(--text-secondary); border: 1px solid var(--glass-border);" onclick="document.getElementById('facultyModal').style.display='none'">Cancel</button>
+                    <button type="submit" class="btn-login"
+                        style="flex: 2; margin: 0; background: #228B22; border-color: #006400; color: #fff;">Commit
+                        Record Update</button>
+                    <button type="button" class="btn-primary"
+                        style="flex: 1; background: #8B0000; color: #fff; border: 2px solid #8B4513;"
+                        onclick="resetStudentPasswordAdmin()">Reset Password</button>
+                    <button type="button" class="btn-primary"
+                        style="flex: 1; background: #FCF5E5; color: var(--text-primary); border: 2px solid #8B4513;"
+                        onclick="closeStudentEditModal()">Abort</button>
                 </div>
             </form>
         </div>
     </div>
 
     <script>
-        function openGlobalEventModal() { document.getElementById('globalEventModal').style.display = 'flex'; }
-        function closeGlobalEventModal() { document.getElementById('globalEventModal').style.display = 'none'; }
+        let riskChartInstance = null;
+        let dataLoaded = { overview: false, students: false, faculty: false, chat: false };
 
-        document.getElementById('globalEventForm').onsubmit = async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            // Global events have no subject_code
-            const res = await fetch('/api/events/add', { method: 'POST', body: formData });
-            if (res.ok) location.reload();
-        };
+        // Core Tab Switcher
+        function switchTab(tabId) {
+            document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
+            document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
 
-        async function deleteEvent(id) {
-            if (confirm('Delete this system event?')) {
-                const res = await fetch(`/api/events/${id}`, { method: 'DELETE' });
-                if (res.ok) location.reload();
-            }
+            // Add active class exactly to clicked tab
+            Array.from(document.querySelectorAll('.tab')).find(t => t.innerText.toLowerCase().includes(tabId)).classList.add('active');
+            document.getElementById('tab-' + tabId).classList.add('active');
+
+            if (!dataLoaded[tabId]) loadTabData(tabId);
         }
 
-        async function resetPassword(username) {
-            if (!confirm(`Generate new temporary PIN for ${username}?`)) return;
-            
-            const formData = new FormData();
-            formData.append('username', username);
-            
-            try {
-                const response = await fetch('/admin/reset-password', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
-                if (data.status === 'success') {
-                    alert(data.message);
-                } else {
-                    alert('Reset failed: ' + data.message);
-                }
-            } catch (err) {
-                alert('System error during reset');
-            }
+        async function loadTabData(tabId) {
+            if (tabId === 'overview') await loadOverview();
+            if (tabId === 'students') await loadStudents();
+            if (tabId === 'faculty') await loadFaculty();
+            if (tabId === 'chat') await loadChat();
+            dataLoaded[tabId] = true;
         }
 
-        document.getElementById('createFacultyForm').onsubmit = async (e) => {
+        // 1. Overview Logic
+        async function loadOverview() {
+            try {
+                const res = await fetch('/admin/api/dashboard_stats');
+                const data = await res.json();
+
+                // Update Stats with immersive styling
+                const statsHtml = `
+                    <div style="background: rgba(139, 69, 19, 0.04); border: 1px solid rgba(139, 69, 19, 0.2); padding: 30px 20px; border-radius: 4px; text-align: center; position: relative; overflow: hidden;">
+                        <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; font-family: var(--font-mono);">> Subject Targets</div>
+                        <div style="font-size: 4.5rem; font-family: 'Times New Roman', serif; font-weight: 900; color: var(--text-primary); line-height: 1;">${data.stats.students}</div>
+                        <div style="font-size: 0.7rem; color: #B22222; font-weight: bold; margin-top: 15px; border-top: 1px solid rgba(139, 69, 19, 0.1); padding-top: 10px;">INDIVIDUALS MONITORED</div>
+                    </div>
+                    <div style="background: rgba(139, 69, 19, 0.04); border: 1px solid rgba(139, 69, 19, 0.2); padding: 30px 20px; border-radius: 4px; text-align: center; position: relative; overflow: hidden;">
+                        <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; font-family: var(--font-mono);">> Active Agents</div>
+                        <div style="font-size: 4.5rem; font-family: 'Times New Roman', serif; font-weight: 900; color: var(--text-primary); line-height: 1;">${data.stats.faculty}</div>
+                        <div style="font-size: 0.7rem; color: #4682B4; font-weight: bold; margin-top: 15px; border-top: 1px solid rgba(139, 69, 19, 0.1); padding-top: 10px;">FACULTY DEPLOYMENTS</div>
+                    </div>
+                    <div style="background: rgba(139, 69, 19, 0.04); border: 1px solid rgba(139, 69, 19, 0.2); padding: 30px 20px; border-radius: 4px; text-align: center; position: relative; overflow: hidden;">
+                        <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; font-family: var(--font-mono);">> Secured Domains</div>
+                        <div style="font-size: 4.5rem; font-family: 'Times New Roman', serif; font-weight: 900; color: var(--text-primary); line-height: 1;">${data.stats.subjects}</div>
+                        <div style="font-size: 0.7rem; color: #228B22; font-weight: bold; margin-top: 15px; border-top: 1px solid rgba(139, 69, 19, 0.1); padding-top: 10px;">OPERATIONAL SUBJECTS</div>
+                    </div>
+                `;
+                document.getElementById('overview-stats').innerHTML = statsHtml;
+
+                // Render Intelligent Graph
+                const ctx = document.getElementById('riskChart').getContext('2d');
+                if (riskChartInstance) riskChartInstance.destroy();
+
+                riskChartInstance = new Chart(ctx, {
+                    type: 'bar',
+                    data: {
+                        labels: ['Critical Risk', 'Moderate Risk', 'Stable', 'High Performer'],
+                        datasets: [{
+                            label: 'Student Count',
+                            data: [
+                                data.distribution.high_risk,
+                                data.distribution.moderate_risk,
+                                data.distribution.stable,
+                                data.distribution.high_performer
+                            ],
+                            backgroundColor: [
+                                '#B22222', // Firebrick Red
+                                '#B8860B', // Dark Goldenrod
+                                '#4682B4', // Steel Blue
+                                '#228B22'  // Forest Green
+                            ],
+                            borderWidth: 1,
+                            borderColor: '#2C1E16',
+                            borderRadius: 6
+                        }]
+                    },
+                    options: {
+                        responsive: true,
+                        maintainAspectRatio: false,
+                        plugins: {
+                            legend: {
+                                display: false
+                            },
+                            tooltip: {
+                                backgroundColor: '#FCF5E5',
+                                titleColor: '#2C1E16',
+                                bodyColor: '#4A3320',
+                                borderColor: '#8B4513',
+                                borderWidth: 1,
+                                padding: 12
+                            }
+                        },
+                        scales: {
+                            y: { beginAtZero: true, grid: { color: 'rgba(139, 69, 19, 0.1)' }, ticks: { color: '#4A3320' } },
+                            x: { grid: { display: false }, ticks: { color: '#2C1E16', font: { weight: 'bold' } } }
+                        }
+                    }
+                });
+            } catch (err) { console.error("Stats Error:", err); }
+        }
+
+        // 2. Students Logic
+        async function loadStudents() {
+            try {
+                const res = await fetch('/admin/api/students');
+                const students = await res.json();
+
+                document.getElementById('student-count').innerText = `${students.length} IDENTITIES TRACKED`;
+
+                let html = '';
+                students.forEach(s => {
+                    let rBadge = 'badge-neutral';
+                    if (s.risk_level === 'Critical') rBadge = 'badge-critical';
+                    else if (s.risk_level === 'High') rBadge = 'badge-high';
+                    else if (s.risk_level === 'Low') rBadge = 'badge-low';
+
+                    const flagHtml = s.burnout_flag ? `<span style="background:var(--accent); color:#fff; padding:2px 6px; border-radius:4px; font-size:0.7em;">Burnout Warning</span>` : '';
+
+                    html += `
+                        <tr>
+                            <td>
+                                <div style="font-weight: 800; color: var(--text-primary);">${s.name} ${flagHtml}</div>
+                                <div style="font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono);">${s.username}</div>
+                            </td>
+                            <td style="font-family: var(--font-mono); font-size: 0.8rem;">
+                                ${s.year || '?'} / ${s.batch || '?'}
+                            </td>
+                            <td><span class="badge ${rBadge}">${s.risk_level}</span></td>
+                            <td>
+                                <div style="display: flex; align-items: center; gap: 8px;">
+                                    <div style="flex: 1; height: 6px; background: rgba(0,0,0,0.1); border-radius: 3px; overflow: hidden;">
+                                        <div style="width: ${s.confidence}%; height: 100%; background: var(--cyan);"></div>
+                                    </div>
+                                    <span style="font-size: 0.7rem; font-family: var(--font-mono);">${s.confidence}%</span>
+                                </div>
+                            </td>
+                            <td style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">
+                                <div style="display:flex; gap: 4px;">
+                                    <button onclick="openStudentEditModal('${s.username}', '${s.name}', '${s.year || ''}', '${s.batch || ''}')"
+                                        class="btn-primary" style="padding:4px 8px; font-size:0.6rem; border-radius:4px; background:var(--bg-secondary); border:1px solid var(--glass-border);" title="Edit Info">✎</button>
+                                    <button onclick="deleteStudentAdmin('${s.username}')"
+                                        class="btn-primary" style="padding:4px 8px; font-size:0.6rem; border-radius:4px; background:rgba(248,113,113,0.1); color:var(--danger); border:1px solid rgba(248,113,113,0.3);" title="Delete Student">×</button>
+                                    <a href="/admin/student/${s.username}"
+                                        class="btn-primary" style="padding:4px 8px; font-size:0.6rem; border-radius:4px; font-weight:800; text-decoration:none;" title="Full Report">View Report</a>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+                if (html === '') html = '<tr><td colspan="5" style="text-align: center;">No students found system-wide.</td></tr>';
+                document.getElementById('student-tbody').innerHTML = html;
+            } catch (err) { console.error("Students error", err); }
+        }
+
+        // 3. Faculty Logic
+        async function loadFaculty() {
+            try {
+                const res = await fetch('/admin/api/faculty');
+                const faculty = await res.json();
+
+                let html = '';
+                faculty.forEach(f => {
+                    html += `
+                        <tr>
+                            <td>
+                                <div style="font-weight: 800; color: var(--text-primary);">${f.name}</div>
+                                <div style="font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono);">${f.username}</div>
+                            </td>
+                            <td>
+                                <div style="font-weight: 600;">${f.subject_name}</div>
+                                <div style="font-size: 0.65rem; color: var(--cyan); font-family: var(--font-mono);">${f.subject_code}</div>
+                            </td>
+                            <td style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); text-align: center;">${f.active_students}</td>
+                            <td>
+                                <span class="badge" style="background: rgba(0,0,0,0.05); color: var(--text-muted);">${f.avg_risk}</span>
+                            </td>
+                            <td style="text-align: center; color: var(--accent); font-weight: 700;">${f.doubt_volume}</td>
+                            <td>
+                                <div style="display: flex; flex-direction: column; gap: 5px; align-items: flex-start;">
+                                    <button class="action-icon" onclick="editFaculty('${f.username}', '${f.name}', '${f.subject_name}', '${f.subject_code}', '${f.email}')">Update Specs</button>
+                                    <button class="action-icon danger" onclick="softDeleteFaculty('${f.username}')">Deactivate (Soft Wipe)</button>
+                                </div>
+                            </td>
+                        </tr>
+                    `;
+                });
+                document.getElementById('faculty-tbody').innerHTML = html;
+            } catch (err) { console.error("Faculty error", err); }
+        }
+
+        // 4. Chat Intelligence Logic
+        async function loadChat(force = false) {
+            try {
+                if (force) document.getElementById('chat-tbody').innerHTML = '<tr><td colspan="5" style="text-align: center;">Scanning records...</td></tr>';
+
+                const student = document.getElementById('chatFilterStudent').value.trim();
+                const subject = document.getElementById('chatFilterSubject').value.trim();
+                const days = document.getElementById('chatFilterDays').value;
+
+                const query = new URLSearchParams();
+                if (student) query.append('student_id', student);
+                if (subject) query.append('subject_code', subject);
+                if (days) query.append('date_range_days', days);
+
+                const res = await fetch('/admin/api/messages?' + query.toString());
+                const messages = await res.json();
+
+                let html = '';
+                messages.forEach(m => {
+                    let rBadge = 'badge-neutral';
+                    if (m.sender_risk === 'Critical') rBadge = 'badge-critical';
+                    else if (m.sender_risk === 'High') rBadge = 'badge-high';
+
+                    let burnoutHtml = m.burnout_flag ? `<span class="burnout-icon" title="High stress indicators detected">\u26A0\uFE0F</span>` : '';
+                    let hlColor = m.burnout_flag ? 'rgba(239, 68, 68, 0.05)' : 'transparent';
+
+                    html += `
+                        <tr style="background: ${hlColor}">
+                            <td style="font-family: var(--font-mono); font-size: 0.75rem;">
+                                ${m.subject_code || 'GLOBAL NETWORK'}
+                            </td>
+                            <td>
+                                <div style="font-weight: 700; color: var(--text-primary);">${m.sender_name || m.sender_id || 'System'} ${burnoutHtml}</div>
+                                <div style="margin-top: 5px;"><span class="badge ${rBadge}">${m.sender_risk}</span></div>
+                            </td>
+                            <td>
+                                <div style="color: var(--text-primary); line-height: 1.4; font-size: 0.85rem; padding: 4px; border-left: 2px solid var(--accent); white-space: pre-wrap; word-break: break-word;">${m.message}</div>
+                                ${m.tag ? `<span class="badge badge-neutral" style="margin-top: 5px; display: inline-block;">#${m.tag}</span>` : ''}
+                            </td>
+                            <td style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">
+                                ${m.receiver_name || m.receiver_id || 'OPEN BROADCAST'}
+                            </td>
+                            <td style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted);">
+                                ${m.sent_at}
+                            </td>
+                        </tr>
+                    `;
+                });
+                if (html === '') html = '<tr><td colspan="5" style="text-align: center;">No verifiable comms matched intel filters.</td></tr>';
+                document.getElementById('chat-tbody').innerHTML = html;
+            } catch (err) { console.error("Chat fetch err", err); }
+        }
+
+        // Modal Controls
+        function openFacultyModal() {
+            document.getElementById('facMode').value = "create";
+            document.getElementById('facultyModalTitle').innerText = "Deploy New Faculty";
+            document.getElementById('facSubmitBtn').innerText = "Initialize Account";
+            document.getElementById('facUser').readOnly = false;
+            document.getElementById('facResetPassBtn').style.display = 'none';
+            document.getElementById('facultyForm').reset();
+            document.getElementById('facultyModal').style.display = 'flex';
+        }
+        function closeFacultyModal() { document.getElementById('facultyModal').style.display = 'none'; }
+
+        function editFaculty(uname, name, sName, sCode, email) {
+            document.getElementById('facMode').value = "update";
+            document.getElementById('facultyModalTitle').innerText = "Update Faculty Specs";
+            document.getElementById('facSubmitBtn').innerText = "Commit Changes";
+
+            document.getElementById('facUser').value = uname;
+            document.getElementById('facUser').readOnly = true; // Cannot change username
+            document.getElementById('facName').value = name;
+            document.getElementById('facSubName').value = sName;
+            document.getElementById('facSubCode').value = sCode;
+            document.getElementById('facResetPassBtn').style.display = 'inline-block';
+            if (email && email !== 'null' && email !== 'None') document.getElementById('facEmail').value = email;
+            else document.getElementById('facEmail').value = "";
+
+            document.getElementById('facultyModal').style.display = 'flex';
+        }
+
+        document.getElementById('facultyForm').onsubmit = async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
-            
+            const mode = document.getElementById('facMode').value;
+            const endpoint = mode === 'create' ? '/admin/create-faculty' : '/admin/update-faculty';
+
             try {
-                const response = await fetch('/admin/create-faculty', {
-                    method: 'POST',
-                    body: formData
-                });
-                const data = await response.json();
-                if (data.status === 'success') {
-                    alert(data.message);
-                    location.reload();
-                } else {
-                    alert('Creation failed: ' + data.message);
-                }
-            } catch (err) {
-                alert('System error during creation');
-            }
+                const res = await fetch(endpoint, { method: 'POST', body: formData });
+                const json = await res.json();
+                if (json.status === 'success') {
+                    if (json.temp_password) alert(json.message);
+                    closeFacultyModal();
+                    loadFaculty();
+                    loadOverview(); // update stats 
+                } else alert("Error: " + json.error);
+            } catch (err) { alert("System fault occurred."); }
         };
+
+        async function softDeleteFaculty(username) {
+            if (!confirm(`WARNING: Deactivating faculty [ ${username} ]. Proceed?`)) return;
+            const fd = new FormData();
+            fd.append("username", username);
+            try {
+                const res = await fetch('/admin/delete-faculty', { method: 'POST', body: fd });
+                if (res.ok) {
+                    loadFaculty();
+                    loadOverview();
+                }
+            } catch (err) { alert("Termination failed."); }
+        }
+
+        // Student Admin Functions
+        function openStudentEditModal(username, name, year, batch) {
+            document.getElementById('editStudentUsername').value = username;
+            document.getElementById('editStudentName').value = name;
+            document.getElementById('editStudentYear').value = year;
+            document.getElementById('editStudentBatch').value = batch;
+            document.getElementById('studentEditModal').style.display = 'flex';
+        }
+
+        function closeStudentEditModal() {
+            document.getElementById('studentEditModal').style.display = 'none';
+        }
+
+        document.getElementById('studentEditForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            try {
+                const res = await fetch('/admin/api/student/update', { method: 'POST', body: formData });
+                const json = await res.json();
+                if (json.status === 'success') {
+                    closeStudentEditModal();
+                    loadStudents();
+                } else alert("Error updating student.");
+            } catch (err) { alert("System fault occurred during update."); }
+        };
+
+        async function deleteStudentAdmin(username) {
+            if (!confirm(`CRITICAL WARNING: Are you sure you want to completely erase student [ ${username} ] from the system?`)) return;
+            try {
+                const res = await fetch('/admin/api/student/' + username, { method: 'DELETE' });
+                if (res.ok) {
+                    loadStudents();
+                    loadOverview();
+                }
+            } catch (err) { alert("Termination failed."); }
+        }
+
+        async function resetStudentPasswordAdmin() {
+            const username = document.getElementById('editStudentUsername').value;
+            if (!confirm(`Reset password for student [ ${username} ]?`)) return;
+
+            const fd = new FormData();
+            fd.append("username", username);
+
+            try {
+                const res = await fetch('/admin/api/student/reset-password', { method: 'POST', body: fd });
+                const json = await res.json();
+                if (json.status === 'success') {
+                    alert(json.message);
+                } else alert("Error resetting password.");
+            } catch (err) { alert("System fault occurred during password reset."); }
+        }
+
+        async function resetFacultyPasswordAdmin() {
+            const username = document.getElementById('facUser').value;
+            if (!confirm(`Reset password for faculty [ ${username} ]?`)) return;
+
+            const fd = new FormData();
+            fd.append("username", username);
+
+            try {
+                const res = await fetch('/admin/reset-password', { method: 'POST', body: fd });
+                const json = await res.json();
+                if (json.status === 'success') {
+                    alert(json.message);
+                } else alert("Error resetting password.");
+            } catch (err) { alert("System fault occurred during password reset."); }
+        }
+
+        // Initialize Phase 1 Start State
+        window.addEventListener('load', () => switchTab('overview'));
+
     </script>
 </body>
+
 </html>

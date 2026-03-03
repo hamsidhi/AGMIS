@@ -1,0 +1,21 @@
+student_id,name,week,lecture_present,lecture_total,practical_present,practical_total,assignments_submitted,assignments_total,internal_marks,external_marks,practical_marks
+1021,Student Year1_B1 1,2,10,10,5,5,0,1,10,31,22
+1022,Student Year1_B1 2,2,10,10,5,5,0,1,17,33,11
+1023,Student Year1_B1 3,2,4,10,3,5,1,1,14,34,19
+1024,Student Year1_B1 4,2,3,10,5,5,0,1,19,69,10
+1025,Student Year1_B1 5,2,3,10,5,5,0,1,19,41,17
+1026,Student Year1_B1 6,2,7,10,1,5,1,1,17,48,23
+1027,Student Year1_B1 7,2,3,10,2,5,1,1,12,50,17
+1028,Student Year1_B1 8,2,6,10,2,5,1,1,14,67,14
+1029,Student Year1_B1 9,2,6,10,1,5,0,1,13,69,23
+1030,Student Year1_B1 10,2,9,10,4,5,0,1,13,47,14
+1031,Student Year1_B1 11,2,10,10,1,5,0,1,15,75,21
+1032,Student Year1_B1 12,2,7,10,2,5,1,1,13,61,19
+1033,Student Year1_B1 13,2,5,10,3,5,1,1,14,55,21
+1034,Student Year1_B1 14,2,5,10,2,5,1,1,19,41,25
+1035,Student Year1_B1 15,2,5,10,4,5,1,1,11,51,25
+1036,Student Year1_B1 16,2,6,10,4,5,0,1,11,41,21
+1037,Student Year1_B1 17,2,5,10,1,5,1,1,17,56,22
+1038,Student Year1_B1 18,2,5,10,2,5,0,1,18,63,19
+1039,Student Year1_B1 19,2,5,10,1,5,1,1,13,39,24
+1040,Student Year1_B1 20,2,6,10,2,5,1,1,16,58,16

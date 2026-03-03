@@ -29,6 +29,8 @@ class DatabaseService:
                 conn.execute("ALTER TABLE users ADD COLUMN subject_code TEXT")
             if "is_first_login" not in cols:
                 conn.execute("ALTER TABLE users ADD COLUMN is_first_login INTEGER DEFAULT 1")
+            if "is_active" not in cols:
+                conn.execute("ALTER TABLE users ADD COLUMN is_active INTEGER DEFAULT 1")
             
             # 2. Records
             conn.execute('''CREATE TABLE IF NOT EXISTS records (
@@ -112,6 +114,7 @@ class DatabaseService:
                 receiver_id TEXT,
                 subject_code TEXT,
                 message TEXT,
+                tag TEXT DEFAULT NULL,
                 parent_id INTEGER DEFAULT NULL, -- For threading/responding to doubts
                 is_read INTEGER DEFAULT 0,
                 sent_at TIMESTAMP DEFAULT CURRENT_TIMESTAMP)''')
@@ -124,6 +127,8 @@ class DatabaseService:
                 conn.execute("ALTER TABLE messages ADD COLUMN is_read INTEGER DEFAULT 0")
             if "sent_at" not in msg_cols:
                 conn.execute("ALTER TABLE messages ADD COLUMN sent_at TIMESTAMP DEFAULT '2024-01-01 00:00:00'")
+            if "tag" not in msg_cols:
+                conn.execute("ALTER TABLE messages ADD COLUMN tag TEXT DEFAULT NULL")
 
             # 10. Audit Logs
             conn.execute('''CREATE TABLE IF NOT EXISTS audit_logs (
@@ -179,6 +184,10 @@ class DatabaseService:
             )
             
             # metrics = [lec_pct, prac_pct, assign_pct, internal, external, practical]
+            conn.execute(
+                "DELETE FROM records WHERE student_id=? AND subject=? AND week=?",
+                (sid, subj, week)
+            )
             conn.execute(
                 '''INSERT INTO records (student_id, subject, week, lec_pct, prac_pct, assign_pct, internal, external, prac_marks) 
                    VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)''',
@@ -243,6 +252,13 @@ class DatabaseService:
         with self.get_conn() as conn:
             row = conn.execute("SELECT * FROM student_profile WHERE student_id=?", (sid,)).fetchone()
         return dict(row) if row else None
+        
+    def get_historical_records(self, student_id: str, subject: str):
+        sid = str(student_id).strip()
+        subj = str(subject).strip()
+        with self.get_conn() as conn:
+            rows = conn.execute("SELECT * FROM records WHERE student_id=? AND subject=? ORDER BY week ASC", (sid, subj)).fetchall()
+        return [dict(r) for r in rows]
 
     def get_students_with_credentials_for_subject(self, subject):
         """Returns list of dicts: name, student_id, password for students in this subject."""
@@ -264,8 +280,56 @@ class DatabaseService:
 
     def get_faculty_list(self):
         with self.get_conn() as conn:
-            rows = conn.execute("SELECT username, name, subject_name, email FROM users WHERE role='faculty'").fetchall()
-        return [dict(r) for r in rows]
+            rows = conn.execute("SELECT username, password, role, name, subject_name, subject_code, email, is_first_login FROM users WHERE role='faculty' AND COALESCE(is_active, 1) = 1").fetchall()
+            faculty_list = []
+            for r in rows:
+                f = dict(r)
+                active = conn.execute("SELECT COUNT(DISTINCT student_id) FROM predictions WHERE subject=?", (f["subject_name"],)).fetchone()[0]
+                high_risk = conn.execute("SELECT COUNT(*) FROM predictions WHERE subject=? AND risk_level IN ('High', 'Critical')", (f["subject_name"],)).fetchone()[0]
+                total_risk = conn.execute("SELECT COUNT(*) FROM predictions WHERE subject=?", (f["subject_name"],)).fetchone()[0]
+                
+                f["active_students"] = active
+                f["avg_risk"] = f"{high_risk}/{total_risk} High Risk" if total_risk > 0 else "N/A"
+                f["doubt_volume"] = conn.execute("SELECT COUNT(*) FROM messages WHERE receiver_id=?", (f["username"],)).fetchone()[0]
+                faculty_list.append(f)
+        return faculty_list
+
+    def delete_user(self, username, user_id_doing_action):
+        with self.get_conn() as conn:
+             conn.execute("UPDATE users SET is_active=0 WHERE username=?", (username,))
+        self.add_audit_log(user_id_doing_action, "DELETE_USER", f"Soft deleted user: {username}")
+
+    def get_all_students(self):
+        with self.get_conn() as conn:
+            rows = conn.execute("""
+                SELECT 
+                    u.username, u.name,
+                    sp.year, sp.batch,
+                    (SELECT risk_level FROM predictions p WHERE p.student_id = u.username ORDER BY 
+                        CASE risk_level 
+                            WHEN 'Critical' THEN 1 
+                            WHEN 'High' THEN 2 
+                            WHEN 'Low' THEN 3 
+                            ELSE 4 END 
+                        LIMIT 1) as risk_level,
+                    (SELECT score FROM predictions p WHERE p.student_id = u.username ORDER BY score ASC LIMIT 1) as min_score,
+                    (SELECT COUNT(*) FROM messages m WHERE m.sender_id = u.username AND m.sent_at > datetime('now', '-7 days')) as doubt_count,
+                    (SELECT MAX(sent_at) FROM messages m WHERE m.sender_id = u.username) as last_activity
+                FROM users u
+                LEFT JOIN student_profile sp ON sp.student_id = u.username
+                WHERE u.role = 'student' AND COALESCE(u.is_active, 1) = 1
+            """).fetchall()
+            
+            res = []
+            for r in rows:
+                d = dict(r)
+                d["confidence"] = 85
+                d["min_score"] = round(float(d["min_score"]), 1) if d["min_score"] is not None else 0.0
+                d["risk_level"] = d["risk_level"] or "N/A"
+                d["burnout_flag"] = bool(d["doubt_count"] and d["doubt_count"] >= 5)
+                d["last_activity"] = d["last_activity"] or "N/A"
+                res.append(d)
+        return res
 
     def update_faculty(self, username: str, name: str | None, subject_name: str | None, email: str | None):
         with self.get_conn() as conn:
@@ -343,6 +407,45 @@ class DatabaseService:
             conn.execute("DELETE FROM calendar_events WHERE id=?", (event_id,))
         self.add_audit_log(user_id, "DELETE_EVENT", f"Event ID: {event_id}")
 
+    def get_all_messages(self, subject_code=None, student_id=None, date_range_days=None):
+        """Intelligent fetch for Admin Chat visibility with filters and flags"""
+        with self.get_conn() as conn:
+            query = """
+                SELECT 
+                    m.*, 
+                    s_user.name as sender_name,
+                    r_user.name as receiver_name,
+                    (SELECT COUNT(*) FROM messages prev WHERE prev.sender_id = m.sender_id AND prev.sent_at > datetime('now', '-7 days')) as sender_recent_doubts,
+                    (SELECT risk_level FROM predictions p WHERE p.student_id = m.sender_id ORDER BY score ASC LIMIT 1) as sender_risk
+                FROM messages m
+                LEFT JOIN users s_user ON m.sender_id = s_user.username
+                LEFT JOIN users r_user ON m.receiver_id = r_user.username
+                WHERE 1=1
+            """
+            params = []
+            
+            if subject_code:
+                query += " AND m.subject_code = ?"
+                params.append(subject_code)
+                
+            if student_id:
+                query += " AND (m.sender_id = ? OR m.receiver_id = ?)"
+                params.extend([student_id, student_id])
+                
+            if date_range_days is not None:
+                query += f" AND m.sent_at > datetime('now', '-{date_range_days} days')"
+                
+            query += " ORDER BY m.sent_at DESC LIMIT 200"
+            rows = conn.execute(query, params).fetchall()
+            
+            res = []
+            for r in rows:
+                d = dict(r)
+                d["burnout_flag"] = (d["sender_recent_doubts"] or 0) >= 5
+                d["sender_risk"] = d["sender_risk"] or "N/A"
+                res.append(d)
+        return res
+
     def get_messages(self, user_id, role=None, other_id=None, subject_code=None):
         with self.get_conn() as conn:
             # Base query: messages involving the user
@@ -367,11 +470,11 @@ class DatabaseService:
             rows = conn.execute(query, params).fetchall()
         return [dict(r) for r in rows]
 
-    def send_message(self, sender_id, receiver_id, subject_code, message, parent_id=None):
+    def send_message(self, sender_id, receiver_id, subject_code, message, tag=None, parent_id=None):
         with self.get_conn() as conn:
-            conn.execute("INSERT INTO messages (sender_id, receiver_id, subject_code, message, parent_id) VALUES (?, ?, ?, ?, ?)",
-                         (sender_id, receiver_id, subject_code, message, parent_id))
-        self.add_audit_log(sender_id, "SEND_MESSAGE", f"To: {receiver_id}, Subject: {subject_code}")
+            conn.execute("INSERT INTO messages (sender_id, receiver_id, subject_code, message, tag, parent_id) VALUES (?, ?, ?, ?, ?, ?)",
+                         (sender_id, receiver_id, subject_code, message, tag, parent_id))
+        self.add_audit_log(sender_id, "SEND_MESSAGE", f"To: {receiver_id}, Subject: {subject_code}, Tag: {tag}")
 
     def get_audit_logs(self, limit=100):
         with self.get_conn() as conn:
