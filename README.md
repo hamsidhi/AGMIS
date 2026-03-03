@@ -4,7 +4,7 @@
 
 AGMIS is an advanced, intelligence-driven academic platform designed to transform regular student data into predictive, actionable guidance. It allows faculty and administrators to monitor student performance in real-time and predict future exam scores, addressing potential drop-outs or failures 4-6 weeks before critical examinations occur.
 
-![AGMIS Banner](https://via.placeholder.com/800x200.png?text=AGMIS+Command+Center)
+
 
 ## 🌟 Core Features
 
