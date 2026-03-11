@@ -10,10 +10,10 @@
   --bg-card: rgba(234, 221, 202, 0.9);
   --glass-border: rgba(139, 69, 19, 0.2);
 
-  --text-primary: #2C1E16;
-  /* Very dark brown/almost black for readability */
-  --text-secondary: #4A3320;
-  --text-muted: #5C4033;
+  --text-primary: #000000;
+  /* Very dark brown/almost black for readability -> Changed to black */
+  --text-secondary: #000000;
+  --text-muted: #000000;
 
   --accent: #8B4513;
   /* Saddle Brown */
@@ -52,7 +52,7 @@ body {
   background-image:
     radial-gradient(circle at 20% 20%, rgba(139, 69, 19, 0.05) 0%, transparent 40%),
     radial-gradient(circle at 80% 80%, rgba(160, 82, 45, 0.05) 0%, transparent 40%);
-  color: var(--text-primary);
+  color: #000000;
   margin: 0;
   min-height: 100vh;
   overflow-x: hidden;
@@ -185,7 +185,7 @@ body {
 .stat-value {
   font-size: 3rem;
   font-weight: 900;
-  color: #fff;
+  color: #000000;
   text-shadow: 0 0 20px rgba(255, 255, 255, 0.1);
 }
 
@@ -290,13 +290,13 @@ body {
 .brief-observation {
   font-size: 0.95rem;
   font-weight: 700;
-  color: var(--text-primary);
+  color: #000000;
   margin-bottom: 8px;
 }
 
 .brief-action {
   font-size: 0.85rem;
-  color: var(--text-secondary);
+  color: #000000;
   line-height: 1.4;
   border-left: 2px solid rgba(0, 0, 0, 0.1);
   padding-left: 12px;
@@ -306,7 +306,7 @@ body {
 .brief-footer {
   font-size: 0.7rem;
   font-family: var(--font-mono);
-  color: var(--text-muted);
+  color: #000000;
   display: flex;
   gap: 15px;
 }
@@ -346,7 +346,7 @@ body {
 .subject-dropdown a {
   display: block;
   padding: 12px 16px;
-  color: var(--text-secondary);
+  color: #000000;
   text-decoration: none;
   border-radius: 8px;
   font-weight: 600;
@@ -373,7 +373,7 @@ body {
 
 .chart-img-wrap {
   height: 350px;
-  background: rgba(139, 69, 19, 0.03);
+  background: rgba(255, 255, 255, 0.03);
   border: 1px solid rgba(139, 69, 19, 0.1);
   border-radius: 12px;
   padding: 20px;
@@ -392,7 +392,7 @@ body {
   text-align: left;
   font-family: var(--font-mono);
   font-size: 0.65rem;
-  color: var(--text-muted);
+  color: #000000;
   text-transform: uppercase;
 }
 
@@ -440,7 +440,7 @@ body {
   top: -20px;
   right: -20px;
   background: #B22222;
-  color: #fff;
+  color: #000000;
   font-weight: bold;
   font-family: 'Courier New', Courier, monospace;
   padding: 5px 15px;

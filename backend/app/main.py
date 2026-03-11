@@ -208,13 +208,13 @@ async def admin_api_stats(request: Request):
     }
 
 @app.get("/admin/api/students")
-async def admin_api_students(request: Request):
+async def admin_api_students(request: Request, year: int = None, batch: str = None):
     uname = request.cookies.get("user_id")
     with db_service.get_conn() as conn:
         admin_row = conn.execute("SELECT * FROM users WHERE username=?", (uname,)).fetchone()
         if not admin_row or admin_row["role"] != "admin":
             return JSONResponse({"error": "Unauthorized"}, status_code=403)
-    return db_service.get_all_students()
+    return db_service.get_all_students(year=year, batch=batch)
 
 @app.get("/admin/api/faculty")
 async def admin_api_faculty(request: Request):
@@ -235,6 +235,30 @@ async def admin_api_messages(request: Request, subject_code: str = None, student
             
     msgs = db_service.get_all_messages(subject_code=subject_code, student_id=student_id, date_range_days=date_range_days)
     return msgs
+
+@app.get("/admin/api/comms")
+async def admin_api_comms(request: Request):
+    """Fetch admin's own sent and received messages, with names populated, for the Admin Comms chat panel."""
+    uname = request.cookies.get("user_id")
+    with db_service.get_conn() as conn:
+        admin_row = conn.execute("SELECT * FROM users WHERE username=?", (uname,)).fetchone()
+        if not admin_row or admin_row["role"] != "admin":
+            return JSONResponse({"error": "Unauthorized"}, status_code=403)
+
+        rows = conn.execute("""
+            SELECT 
+                m.*,
+                s.name AS sender_name,
+                r.name AS receiver_name
+            FROM messages m
+            LEFT JOIN users s ON m.sender_id = s.username
+            LEFT JOIN users r ON m.receiver_id = r.username
+            WHERE m.sender_id = 'admin'
+               OR m.receiver_id = 'admin'
+               OR m.subject_code IN ('BROADCAST_ALL', 'BROADCAST_FACULTY', 'BROADCAST_STUDENTS', 'DIRECT_ADMIN')
+            ORDER BY m.sent_at ASC
+        """).fetchall()
+    return [dict(r) for r in rows]
 
 @app.post("/admin/delete-faculty")
 async def admin_api_delete_faculty(request: Request, username: str = Form(...)):
@@ -503,7 +527,7 @@ async def send_message(
     
     # Inquiry Routing Logic
     if not receiver_id:
-        if subject_code == "GLOBAL":
+        if subject_code in ("GLOBAL", "BROADCAST_STUDENTS", "BROADCAST_FACULTY", "BROADCAST_ALL"):
             receiver_id = None
         else:
             with db_service.get_conn() as conn:
@@ -1183,19 +1207,20 @@ async def student_dash(request: Request, subject_idx: int | None = None, student
         )
 
     subjects = {}
+    EXCLUDED_SUBJECTS = {"Unknown", "Overall", "Subject", "subject", "N/A", "", None}
     for r in records:
         key = r.get("subject") or "Overall"
-        if key in ("Unknown", "Overall"): continue # Clean architecture: filter out legacy mock subjects
+        if key in EXCLUDED_SUBJECTS: continue
         subjects.setdefault(key, {"records": [], "preds": [], "notifs": []})
         subjects[key]["records"].append(r)
     for p in preds:
         key = p.get("subject") or "Overall"
-        if key in ("Unknown", "Overall"): continue
+        if key in EXCLUDED_SUBJECTS: continue
         subjects.setdefault(key, {"records": [], "preds": [], "notifs": []})
         subjects[key]["preds"].append(p)
     for n in notifs:
         key = n.get("subject") or "Overall"
-        if key in ("Unknown", "Overall"): continue
+        if key in EXCLUDED_SUBJECTS: continue
         subjects.setdefault(key, {"records": [], "preds": [], "notifs": []})
         subjects[key]["notifs"].append(n)
 

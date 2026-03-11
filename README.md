@@ -1,152 +1,190 @@
-# AGMIS — Academic Guidance, Motivation & Intelligence System
+<div align="center">
+  <img src="https://via.placeholder.com/800x200/2A2A2A/FFCC00?text=AGMIS+Command+Center" alt="AGMIS Banner">
 
-**Final Year B.Sc Data Science · Atharva College, Malad**
+  <h1>AGMIS</h1>
+  <h3>Academic Guidance, Motivation & Intelligence System</h3>
+  <i>An advanced, intelligence-driven academic platform transforming student data into predictive, actionable guidance.</i>
 
-AGMIS is an advanced, intelligence-driven academic platform designed to transform regular student data into predictive, actionable guidance. It allows faculty and administrators to monitor student performance in real-time and predict future exam scores, addressing potential drop-outs or failures 4-6 weeks before critical examinations occur.
+  <p align="center">
+    <a href="#-about-agmis"><strong>Explore the Docs</strong></a> ·
+    <a href="#-core-features"><strong>View Features</strong></a> ·
+    <a href="#-quickstart--installation"><strong>Get Started</strong></a>
+  </p>
 
-![AGMIS Banner](https://via.placeholder.com/800x200.png?text=AGMIS+Command+Center)
+  <p align="center">
+    <img src="https://img.shields.io/badge/Python-3.9+-FFD43B?style=for-the-badge&logo=python&logoColor=blue" alt="Python">
+    <img src="https://img.shields.io/badge/FastAPI-005571?style=for-the-badge&logo=fastapi" alt="FastAPI">
+    <img src="https://img.shields.io/badge/scikit_learn-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white" alt="Scikit-Learn">
+    <img src="https://img.shields.io/badge/SQLite-07405E?style=for-the-badge&logo=sqlite&logoColor=white" alt="SQLite">
+    <img src="https://img.shields.io/badge/Status-Active-brightgreen?style=for-the-badge" alt="Status">
+  </p>
+</div>
+
+<br />
+
+## 📖 About AGMIS
+
+**Final Year B.Sc Data Science Capstone Project · Atharva College, Malad**
+
+AGMIS is engineered to combat academic stagnation by predicting student performance **4-6 weeks before critical examinations occur**. By monitoring real-time data inputs—such as attendance drops, assignment submission rates, and internal marks—AGMIS intelligently classifies students into risk profiles. It gives **faculty** a bird's-eye view to deploy early interventions and empowers **students** with ultra-personalized, rule-based course corrections to stay ahead.
+
+---
 
 ## 🌟 Core Features
 
-AGMIS provides three distinct levels of access and functionality:
+### 🎓 1. Student Dossiers (Student Command Center)
+Empowering the scholar with actionable clarity.
+- **🔮 Predictive Scoring:** Harnesses a trained Random Forest model to forecast future final exam scores based on historical data.
+- **🚦 Risk Classification System:** Students are instantly triaged into dynamic profiles: *Critical, High Risk, Moderate, or High Performer*.
+- **🎯 Actionable Guidance Engine:** Generates real-time, mathematically-backed advice (e.g., *"Improve attendance to 85%+ to secure ~8 extra marks"*).
+- **✉️ Direct Faculty Communication:** Secure, continuous two-way communication channel to resolve doubts directly with subject professors.
 
-### 1. Student Dossiers (Student View)
-- **Predictive Scoring**: Uses a trained Random Forest and Regression ML models to predict upcoming exam scores based on historical attendance, assignments, and exam performance.
-- **Risk Classification**: Classifies students into distinct risk profiles: Critical, High Risk, Moderate, and High Performer.
-- **Personalized Actionable Guidance**: Generates rule-based, specific advice tailored to the student (e.g., “Improve attendance to 85%+ to gain ~8 marks”).
-- **Direct Faculty Communication**: Students can securely ask questions and seek doubt clarifications from their dedicated subject faculty.
+### 👨‍🏫 2. Faculty Command Center (Intervention Dashboard)
+Giving educators the ultimate analytical upper hand.
+- **📊 Omni-Batch Analytics:** Visualize predictive performance distributions of the entire class dynamically.
+- **🚩 Target At-Risk Identification:** Immediately red-flags highly critical student profiles to deploy priority academic interventions.
+- **💬 Doubt Management System:** Features a centralized inbox for faculty to review, answer, and manage student queries with full historic chat persistence.
+- **📁 Frictionless Data Ingestion:** Drag-and-drop CSV upload for rapid attendance and internal marks syncing—triggering immediate, on-the-fly model re-predictions.
 
-### 2. Faculty Command Center (Faculty View)
-- **Batch Analytics & Insights**: A holistic view of the assigned class, dynamically plotting the predictive performance distribution.
-- **At-Risk Identification**: Readily identifiable flags pinpoint students classified as "Critical" or "High Risk," focusing intervention efforts where they matter most.
-- **Doubt Management System**: Faculty can review and directly answer specific doubts and queries raised by students under their purview, featuring full chat history and summarization.
-- **Student Management**: Faculty can directly manage their students, including the ability to reset compromised student passwords securely.
-- **Data Integration**: Easy drag-and-drop CSV upload for ingesting new attendance and marks data, automatically updating predictions on the fly.
-
-### 3. Institutional Risk Console (Admin View)
-- **Global Surveillance**: Admins oversee the entire institution’s real-time risk distribution across all active subjects and batches.
-- **Faculty Deployment & Evaluation**: Admins can safely deploy new faculty, manage their access credentials, and monitor their active caseloads and resolved doubt volumes. (Features Safe Soft-Deletes and UPSERT re-creation).
-- **Global Account Management**: Admins possess overarching authority to reset passwords for both Faculty members and Students across the entire system.
-- **Communication Visibility**: Broad-scale monitoring of system communications flagged by predictive models (e.g., Burnout Warning badges on highly stressed students who send 5+ queries a week).
-- **Secure, Vintage Theming**: Completely overhauled UI/UX design with an immersive "Oldschool Detective Dossier" vibe—featuring high-contrast khaki, beige, and strict monospace typography.
+### 🛡️ 3. Institutional Risk Console (Admin View)
+Overarching surveillance of academic health across all systems.
+- **🌍 Global Surveillance Network:** Aggregate view of real-time risk distribution mapping across all assigned courses and faculty branches.
+- **👥 Seamless Personnel Deployment:** Admins control faculty credentialing, user access thresholds, and manage operations like Safe Soft-Deletes.
+- **🎨 Immersive, Vintage UI/UX:** Complete visual overhaul featuring an "Oldschool Detective Dossier" aesthetic—with high-contrast khaki/beige styling and strict monospace typography.
 
 ---
 
 ## 🏗️ Technical Architecture
 
-AGMIS follows a classic monolithic Model-View-Controller architecture built on a high-performance Python backend.
+AGMIS enforces a classic monolithic **Model-View-Controller (MVC)** architectural blueprint built to scale around a high-performance Python ASYNC core.
 
-| Layer        | Technology                                                                 |
-|--------------|-----------------------------------------------------------------------------|
-| **Frontend** | Pure HTML/CSS styled with a Vintage Light Theme, Jinja2 Templates, Chart.js JS graphs |
-| **Backend**  | FastAPI (Python) for asynchronous endpoints and robust validation          |
-| **Database** | SQLite3 (Local file-based database for portability)                        |
-| **Machine Learning** | `scikit-learn` (Random Forest, Linear Regression, Joblib Serialization) |
+<div align="center">
 
-### Key Project Structure
+| System Layer | Core Technology Stack | Functionality |
+| :--- | :--- | :--- |
+| **Frontend/UI** | `HTML5`, `CSS3` (Vanilla), `Jinja2`, `Chart.js` | Vintage "Light" Theme, Dynamic UI Generation, Graphical Data Plotting |
+| **Backend API** | `FastAPI` (Python) | High-speed async routing, concurrent request handling, validation |
+| **Database** | `SQLite3` (Local DB) | Ephemeral, ultra-portable persistence using normalized schemas |
+| **ML Engine** | `scikit-learn`, `Pandas`, `NumPy` | Machine learning pipelines, Random Forest Classification, joblib |
 
-```bash
-agmis/
-├── backend/
-│   ├── app/
-│   │   ├── ml/                # Scikit-Learn data pipelines & predictors
-│   │   ├── services/          # Database connection, CRUD operations, & queries
-│   │   ├── static/            # Vintage/Beige CSS files & static assets
-│   │   ├── templates/         # HTML Jinja2 Views (Login, Admin, Faculty, Student)
-│   │   └── main.py            # FastAPI Application Entrypoint & JSON Routes
-│   ├── models/                # Saved serialized ML Models (.joblib)
-│   └── agmis.db               # The generated SQLite Database
-└── README.md                  # This documentation
+</div>
+
+### 📂 Directory Structure
+
+```text
+📦 AGMIS Core
+ ┣ 📂 backend/
+ ┃ ┣ 📂 app/
+ ┃ ┃ ┣ 📂 ml/           # Scikit-Learn data pipelines & predictors
+ ┃ ┃ ┣ 📂 services/     # Database singletons, CRUD ops, analytics integration
+ ┃ ┃ ┣ 📂 static/       # Vintage CSS/JS assets
+ ┃ ┃ ┣ 📂 templates/    # UI Views (Login, Admin, Faculty, Student)
+ ┃ ┃ ┗ 📜 main.py       # FastAPI Application Entrypoint & Endpoints
+ ┃ ┣ 📂 models/         # Multi-layered .joblib serialized neural/forest models
+ ┃ ┗ 📜 agmis.db        # Mission-Critical SQLite Datastore
+ ┣ 📂 mock_data/        # Simulated large-scale dataset generation 
+ ┣ 📂 Docs/             # Institutional Project Reports & Blackbook
+ ┣ 📜 PROJECT_STATUS.md # Current Project Checklist against initial PRD
+ ┣ 📜 FUTURE_ASPECTS.md # Future Roadmap & Admin Audit Log capabilities
+ ┗ 📜 README.md         # Documentation Reference (You are here)
 ```
 
 ---
 
 ## 🚀 Quickstart & Installation
 
-To run AGMIS locally on your machine, you must have `Python 3.9+` installed.
+Get the command center up and running globally or locally in **3 minutes flat**. Requires `Python 3.9+`.
 
-### 1. Clone the Repository & Enter Directory
+### Step 1. Clone & Enter
 ```bash
-git clone https://github.com/your-username/agmis.git
-cd agmis/backend
+git clone https://github.com/hamsidhi/AGMIS.git
+cd AGMIS
 ```
 
-### 2. Set Up the Virtual Environment
+### Step 2. Isolate the Environment
 ```bash
 # Windows
 python -m venv venv
 venv\Scripts\activate
 
-# macOS / Linux
+# macOS / Linux OS
 python3 -m venv venv
 source venv/bin/activate
 ```
 
-### 3. Install Required Dependencies
+### Step 3. Initialize Operational Modules
 ```bash
-pip install -r requirements.txt
+# Inside the top level / AGMIS directory:
+pip install -r backend/requirements.txt
 ```
-*If you are generating predictions, make sure the ML stack is installed:*
-```bash
-pip install fastapi uvicorn multipart jinja2 scikit-learn pandas python-multipart
-```
+*(Dependencies include: FastAPI, Uvicorn, Jinja2, Scikit-Learn, Pandas, Python-Multipart)*
 
-### 4. Boot the Command Center
-You can manually start the application using `uvicorn`:
+### Step 4. Ignite the Core
 ```bash
 cd backend
 uvicorn app.main:app --reload --host 127.0.0.1 --port 8000
 ```
-*(The `--reload` flag will auto-refresh the server when file changes are detected).*
+*System Live Feedback: Visit [`http://127.0.0.1:8000`](http://127.0.0.1:8000) to access the central gateway.*
 
 ---
 
-## 🧪 Generating Mock Data
+## 🧪 Simulation / Mock Data Pipeline
 
-For testing the application, AGMIS includes a robust data generator that creates realistic, synchronized student records across multiple subjects, batches, and weeks.
+AGMIS boasts a fully functioning algorithmic data generator designed to rigorously stress-test the classification engine over massive arrays of data spanning multi-week simulations.
 
 ```bash
+# From the root directory:
 python mock_data_generator.py
 ```
 
-This script will automatically generate a `mock_data/` directory containing CSV files for:
-- **Batches**: Year1_A1, Year1_B1
-- **Subjects**: Machine Learning, Data Governance, Computer Networks, Software Engineering, Database Systems
-- **Timeline**: Week 1, Week 2, Week 3
+**What it does:**
+Instantly synchronizes arrays of realistic CSVs encompassing:
+- **Multiple Batches** *(e.g. Year1_A1, Year1_B1)*
+- **Diverse Subjects** *(Machine Learning, Data Governance, OS, Software Engineering)*
+- **Timeline Extrapolations** *(Auto-scaling across Weeks 1, 2, and 3)*
 
-*Note: The script ensures that student names and IDs remain perfectly consistent across all subjects and weeks for a given batch, making it ideal for testing historical tracking and multi-subject analytics.*
-
----
-
-## 🔑 Default Authorization Credentials
-
-To access the various dashboards, navigate to `http://127.0.0.1:8000` in your web browser. 
-Due to the system's strict architectural separation, you must log in using the correct assigned identifiers.
-
-- **Admin Console:**
-  - *Username:* `admin`
-  - *Password:* `admin`
-- **Faculty View (Machine Learning):**
-  - *Username:* `hiral`
-  - *Password:* `ml123`
-- **Student View:**
-  - Login requires a valid `student_id` created via Faculty CSV Upload. 
-  - *Default Password:* `1234`
+*This pipeline guarantees persistent `student_id` validation constraints across historical bounds—perfect for ML stress testing.*
 
 ---
 
-## 📊 Standard CSV Data Format 
+## 🔑 Default Global Access Credentials
 
-For the Machine Learning pipelines to process data correctly, Faculty batch-uploads must be formatted as follows:
+AGMIS requires highly strict horizontal segregation of roles. To test operations, authenticate through the main portal using these designated access hashes:
+
+<div align="center">
+
+| Operational Tier | Default Username | Standard Password | Scope of Access |
+| :--- | :--- | :--- | :--- |
+| **Global Admin Console** | `admin` | `admin` | Level 5 System wide control, all subjects, all analytics. |
+| **Faculty Dashboard** | `hiral` | `ml123` | Control over Machine Learning batch arrays. |
+| **Student Profiles** | *(Valid Target ID)* | `1234` | Highly restricted singular dossier access. |
+
+</div>
+
+> **Note:** A valid `student_id` must either be uploaded through the Faculty CSV Intake Portal or found inside the native Database generation files prior to initial student login.
+
+---
+
+## 📊 CSV Standard Integrity Protocol
+
+To push raw academic metrics into the Machine Learning ingestion engine, Faculty uploads MUST conform exactly to the AGMIS dimensional standard:
 
 | student_id | name | week | lecture_present | lecture_total | assignments_submitted | internal_marks |
-|------------|------|------|-----------------|---------------|-----------------------|----------------|
-| 101        | John | 1    | 8               | 10            | 2                     | 18             |
+| :--- | :--- | :--- | :--- | :--- | :--- | :--- |
+| 1042X | John Doe | 1 | 8 | 10 | 2 | 18 |
 
-Upon successful upload via the Faculty Dashboard, AGMIS immediately normalizes the data, runs the active predictive algorithm, saves the new output predictions to the Database, and updates the Global Risk Distribution graphs.
+> **Process Flow:** The moment CSV arrays are synchronized via the Dashboard, AGMIS immediately cleanses data anomalies, pushes matrices to predictive instances, locks target classification, caches to Local DB, and completely rewires global dynamic distribution charts—*in milliseconds*.
 
 ---
 
-## 🔒 Security & License
-*AGMIS is a Final Year Academic Capstone Project.*
-While safe architectural patterns (such as Soft-Deletes via the `is_active` flag, session cookie limits, and password salting mechanisms) have been built into the database structures to resemble a production application, please DO NOT deploy this publicly with real Student Personally Identifiable Information (PII) without migrating the authentication system to a secure provider (like OAuth2 or Supabase) and enabling strict HTTPS routing protocols.
+## 📜 Legal & Security
+
+> **Academic Notice:** Designed exclusively as a capstone university system architecture. Built with "Soft-Deletes" (`is_active` logic boolean architecture) and foundational password routing to simulate Real-World implementations.
+
+*Warning: If deploying for production academic scenarios, do NOT host on exposed ports with raw Student PII. Mandatory integration with OAuth2 pipelines, robust JWT refresh tokens, and strict Transport Layer Security (HTTPS) overrides must be prioritized before institutional deployment.*
+
+<div align="center">
+  <br>
+  <b>Built with Intelligence, Engineered for Guidance</b><br>
+  <i>— AGMIS 2026 —</i>
+</div>

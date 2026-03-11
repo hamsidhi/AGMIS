@@ -24,7 +24,7 @@
         .tab {
             padding: 10px 20px;
             cursor: pointer;
-            color: var(--text-muted);
+            color: #000000;
             font-weight: 500;
             font-size: 0.85rem;
             border-radius: 8px;
@@ -36,7 +36,7 @@
 
         .tab:hover {
             background: rgba(255, 255, 255, 0.05);
-            color: #fff;
+            color: #000000;
         }
 
         .tab.active {
@@ -106,8 +106,8 @@
 
         .badge-neutral {
             background: rgba(255, 255, 255, 0.05);
-            border-color: rgba(255, 255, 255, 0.2);
-            color: var(--text-muted);
+            border-color: #000000;
+            color: #000000;
         }
 
         .burnout-icon {
@@ -149,17 +149,18 @@
         <div class="actions">
             <!-- Global Actions specific to the viewed tab could go here, for now just Logout -->
             <a href="/logout" class="btn-primary"
-                style="padding: 10px 20px; font-size: 0.8rem; border-radius: 10px; background: var(--bg-primary); color: var(--text-secondary);">Disconnect</a>
+                style="padding: 10px 20px; font-size: 0.8rem; border-radius: 10px; background: var(--bg-primary); color: #000000;">Disconnect</a>
         </div>
     </div>
 
     <div class="container">
         <!-- Intelligent Tab Navigation -->
         <div class="tabs">
-            <div class="tab active" onclick="switchTab('overview')">System Overview</div>
-            <div class="tab" onclick="switchTab('students')">Student Intelligence</div>
-            <div class="tab" onclick="switchTab('faculty')">Faculty Evaluation</div>
-            <div class="tab" onclick="switchTab('chat')">Chat Intelligence</div>
+            <div class="tab active" onclick="switchTab('overview', this)">System Overview</div>
+            <div class="tab" onclick="switchTab('students', this)">Student Intelligence</div>
+            <div class="tab" onclick="switchTab('faculty', this)">Faculty Evaluation</div>
+            <div class="tab" onclick="switchTab('chat', this)">Chat Intelligence</div>
+
             <div class="tab" style="opacity: 0.4; cursor: not-allowed;" title="Part of Phase 3">Audit & Cal (Ph 3)</div>
         </div>
 
@@ -171,7 +172,7 @@
                     <h2
                         style="font-family: 'Courier New', Courier, monospace; color: #B22222; margin: 0 0 5px 0; font-size: 2.2rem; text-transform: uppercase; letter-spacing: 2px;">
                         Global Threat Matrix</h2>
-                    <div style="font-size: 0.8rem; color: var(--text-muted); font-family: var(--font-mono);">
+                    <div style="font-size: 0.8rem; color: #000000; font-family: var(--font-mono);">
                         CLASSIFICATION: TOP SECRET // ADMIN EYES ONLY</div>
                 </div>
                 <div
@@ -183,18 +184,18 @@
             <div class="stats-grid"
                 style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px;"
                 id="overview-stats">
-                <div style="padding: 20px; text-align: center; color: var(--text-muted);">Initializing Uplink...</div>
+                <div style="padding: 20px; text-align: center; color: #000000;">Initializing Uplink...</div>
             </div>
 
             <div class="card"
-                style="border: 2px solid rgba(139, 69, 19, 0.3); background: #FCF5E5; box-shadow: 6px 6px 0px rgba(139, 69, 19, 0.1);">
+                style="border: 2px solid rgba(139, 69, 19, 0.3); background: #FCF5E5; box-shadow: 6px 6px 0px rgba(139, 69, 19, 0.1); transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 12px 24px rgba(139, 69, 19, 0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='6px 6px 0px rgba(139, 69, 19, 0.1)';">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
                     <div>
                         <h3
-                            style="margin: 0; color: var(--text-primary); font-size: 1.1rem; border-bottom: 1px dashed rgba(139, 69, 19, 0.3); padding-bottom: 5px; display: inline-block;">
+                            style="margin: 0; color: #000000; font-size: 1.1rem; border-bottom: 1px dashed rgba(139, 69, 19, 0.3); padding-bottom: 5px; display: inline-block;">
                             Institutional Risk Distribution</h3>
                         <div
-                            style="font-size: 0.7rem; color: var(--text-muted); margin-top: 8px; font-family: var(--font-mono);">
+                            style="font-size: 0.7rem; color: #000000; margin-top: 8px; font-family: var(--font-mono);">
                             > Aggregating live predictive models across all sectors</div>
                     </div>
                 </div>
@@ -209,9 +210,31 @@
         <div id="tab-students" class="tab-content">
             <div class="card">
                 <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 25px;">
-                    <h3 style="margin: 0;">Global Student Monitoring</h3>
-                    <span style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted);"
-                        id="student-count">...</span>
+                    <div style="display: flex; gap: 15px; align-items: center;">
+                        <h3 style="margin: 0;">Global Student Monitoring</h3>
+                        <span style="font-family: var(--font-mono); font-size: 0.7rem; font-weight: bold; color: rgba(139, 69, 19, 0.8);" id="student-count">...</span>
+                    </div>
+
+                    <div style="display: flex; align-items: center; gap: 8px; font-size: 0.75rem; font-weight: bold; background: rgba(139, 69, 19, 0.05); padding: 6px 16px; border-radius: 6px; border: 1px solid rgba(139, 69, 19, 0.2);">
+                        <span>YEAR</span>
+                        <select id="studentFilterYear" class="input-field" style="width: auto; padding: 4px 24px 4px 8px; margin: 0; background-color: transparent; border: none; font-weight: bold; -webkit-appearance: none; appearance: none; background: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22currentColor%22 stroke-width=%223%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%226 9 12 15 18 9%22></polyline></svg>') no-repeat right 4px center; cursor: pointer;">
+                            <option value="">All</option>
+                            <option value="1">1</option><option value="2">2</option><option value="3">3</option><option value="4">4</option>
+                        </select>
+                        
+                        <span style="border-left: 1px solid rgba(139, 69, 19, 0.2); height: 16px; margin: 0 4px;"></span>
+                        
+                        <span>BATCH</span>
+                        <select id="studentFilterBatch" class="input-field" style="width: auto; padding: 4px 24px 4px 8px; margin: 0; background-color: transparent; border: none; font-weight: bold; -webkit-appearance: none; appearance: none; background: url('data:image/svg+xml;utf8,<svg xmlns=%22http://www.w3.org/2000/svg%22 width=%2216%22 height=%2216%22 viewBox=%220 0 24 24%22 fill=%22none%22 stroke=%22currentColor%22 stroke-width=%223%22 stroke-linecap=%22round%22 stroke-linejoin=%22round%22><polyline points=%226 9 12 15 18 9%22></polyline></svg>') no-repeat right 4px center; cursor: pointer;">
+                            <option value="">All</option>
+                            <option value="A1">A1</option><option value="A2">A2</option><option value="A3">A3</option>
+                            <option value="B1">B1</option><option value="B2">B2</option><option value="B3">B3</option>
+                            <option value="C1">C1</option><option value="C2">C2</option><option value="C3">C3</option>
+                            <option value="D1">D1</option><option value="D2">D2</option><option value="D3">D3</option>
+                        </select>
+                        
+                        <button class="btn-primary" style="padding: 4px 12px; font-size: 0.75rem; border: 2px solid #000; background: #e5e7eb; color: #000; margin-left: 10px; border-radius: 6px;" onclick="loadStudents(true)">Update View</button>
+                    </div>
                 </div>
                 <div class="table-scroll">
                     <table class="styled-table">
@@ -226,7 +249,7 @@
                         </thead>
                         <tbody id="student-tbody">
                             <tr>
-                                <td colspan="5" style="text-align: center; color: var(--text-muted);">Fetching
+                                <td colspan="5" style="text-align: center; color: #000000;">Fetching
                                     intelligence...</td>
                             </tr>
                         </tbody>
@@ -257,7 +280,7 @@
                         </thead>
                         <tbody id="faculty-tbody">
                             <tr>
-                                <td colspan="6" style="text-align: center; color: var(--text-muted);">Analyzing faculty
+                                <td colspan="6" style="text-align: center; color: #000000;">Analyzing faculty
                                     metrics...</td>
                             </tr>
                         </tbody>
@@ -302,7 +325,7 @@
                         </thead>
                         <tbody id="chat-tbody">
                             <tr>
-                                <td colspan="5" style="text-align: center; color: var(--text-muted);">Initializing
+                                <td colspan="5" style="text-align: center; color: #000000;">Initializing
                                     surveillance...</td>
                             </tr>
                         </tbody>
@@ -337,10 +360,10 @@
                     <button type="submit" class="btn-login" style="flex: 2; margin: 0;" id="facSubmitBtn">Initialize
                         Account</button>
                     <button type="button" class="btn-primary" id="facResetPassBtn"
-                        style="display: none; flex: 1; background: #8B0000; color: #fff; border: 2px solid #8B4513;"
+                        style="display: none; flex: 1; background: #8B0000; color: #000000; border: 2px solid #8B4513;"
                         onclick="resetFacultyPasswordAdmin()">Reset Password</button>
                     <button type="button" class="btn-primary"
-                        style="flex: 1; background: var(--bg-primary); color: var(--text-secondary); border: 1px solid var(--glass-border);"
+                        style="flex: 1; background: var(--bg-primary); color: #000000; border: 1px solid var(--glass-border);"
                         onclick="closeFacultyModal()">Abort</button>
                 </div>
             </form>
@@ -357,7 +380,7 @@
                 Update Student Dossier</h2>
             <form id="studentEditForm" class="login-form">
                 <input type="text" id="editStudentUsername" name="username" class="input-field" readonly
-                    style="background: rgba(0,0,0,0.05); color: var(--text-muted); cursor: not-allowed;">
+                    style="background: rgba(0,0,0,0.05); color: #000000; cursor: not-allowed;">
                 <input type="text" id="editStudentName" name="name" placeholder="Full Name" class="input-field"
                     required>
                 <input type="text" id="editStudentYear" name="year" placeholder="Year (e.g. FY, SY, TY, BTech)"
@@ -367,13 +390,13 @@
 
                 <div style="display: flex; gap: 15px; margin-top: 20px;">
                     <button type="submit" class="btn-login"
-                        style="flex: 2; margin: 0; background: #228B22; border-color: #006400; color: #fff;">Commit
+                        style="flex: 2; margin: 0; background: #228B22; border-color: #006400; color: #000000;">Commit
                         Record Update</button>
                     <button type="button" class="btn-primary"
-                        style="flex: 1; background: #8B0000; color: #fff; border: 2px solid #8B4513;"
+                        style="flex: 1; background: #8B0000; color: #000000; border: 2px solid #8B4513;"
                         onclick="resetStudentPasswordAdmin()">Reset Password</button>
                     <button type="button" class="btn-primary"
-                        style="flex: 1; background: #FCF5E5; color: var(--text-primary); border: 2px solid #8B4513;"
+                        style="flex: 1; background: #FCF5E5; color: #000000; border: 2px solid #8B4513;"
                         onclick="closeStudentEditModal()">Abort</button>
                 </div>
             </form>
@@ -385,13 +408,20 @@
         let dataLoaded = { overview: false, students: false, faculty: false, chat: false };
 
         // Core Tab Switcher
-        function switchTab(tabId) {
+        function switchTab(tabId, element) {
             document.querySelectorAll('.tab').forEach(t => t.classList.remove('active'));
             document.querySelectorAll('.tab-content').forEach(c => c.classList.remove('active'));
 
-            // Add active class exactly to clicked tab
-            Array.from(document.querySelectorAll('.tab')).find(t => t.innerText.toLowerCase().includes(tabId)).classList.add('active');
-            document.getElementById('tab-' + tabId).classList.add('active');
+            // Add active class if element passed, otherwise find it safely
+            if (element) {
+                element.classList.add('active');
+            } else {
+                const targetTab = document.querySelector(`.tab[onclick*="${tabId}"]`);
+                if (targetTab) targetTab.classList.add('active');
+            }
+            
+            const targetContent = document.getElementById('tab-' + tabId);
+            if (targetContent) targetContent.classList.add('active');
 
             if (!dataLoaded[tabId]) loadTabData(tabId);
         }
@@ -401,6 +431,7 @@
             if (tabId === 'students') await loadStudents();
             if (tabId === 'faculty') await loadFaculty();
             if (tabId === 'chat') await loadChat();
+            if (tabId === 'comms') await loadAdminComms();
             dataLoaded[tabId] = true;
         }
 
@@ -413,18 +444,18 @@
                 // Update Stats with immersive styling
                 const statsHtml = `
                     <div style="background: rgba(139, 69, 19, 0.04); border: 1px solid rgba(139, 69, 19, 0.2); padding: 30px 20px; border-radius: 4px; text-align: center; position: relative; overflow: hidden;">
-                        <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; font-family: var(--font-mono);">> Subject Targets</div>
-                        <div style="font-size: 4.5rem; font-family: 'Times New Roman', serif; font-weight: 900; color: var(--text-primary); line-height: 1;">${data.stats.students}</div>
+                        <div style="font-size: 0.75rem; font-weight: 800; color: #000000; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; font-family: var(--font-mono);">> Subject Targets</div>
+                        <div style="font-size: 4.5rem; font-family: 'Times New Roman', serif; font-weight: 900; color: #000000; line-height: 1;">${data.stats.students}</div>
                         <div style="font-size: 0.7rem; color: #B22222; font-weight: bold; margin-top: 15px; border-top: 1px solid rgba(139, 69, 19, 0.1); padding-top: 10px;">INDIVIDUALS MONITORED</div>
                     </div>
                     <div style="background: rgba(139, 69, 19, 0.04); border: 1px solid rgba(139, 69, 19, 0.2); padding: 30px 20px; border-radius: 4px; text-align: center; position: relative; overflow: hidden;">
-                        <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; font-family: var(--font-mono);">> Active Agents</div>
-                        <div style="font-size: 4.5rem; font-family: 'Times New Roman', serif; font-weight: 900; color: var(--text-primary); line-height: 1;">${data.stats.faculty}</div>
+                        <div style="font-size: 0.75rem; font-weight: 800; color: #000000; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; font-family: var(--font-mono);">> Active Agents</div>
+                        <div style="font-size: 4.5rem; font-family: 'Times New Roman', serif; font-weight: 900; color: #000000; line-height: 1;">${data.stats.faculty}</div>
                         <div style="font-size: 0.7rem; color: #4682B4; font-weight: bold; margin-top: 15px; border-top: 1px solid rgba(139, 69, 19, 0.1); padding-top: 10px;">FACULTY DEPLOYMENTS</div>
                     </div>
                     <div style="background: rgba(139, 69, 19, 0.04); border: 1px solid rgba(139, 69, 19, 0.2); padding: 30px 20px; border-radius: 4px; text-align: center; position: relative; overflow: hidden;">
-                        <div style="font-size: 0.75rem; font-weight: 800; color: var(--text-muted); text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; font-family: var(--font-mono);">> Secured Domains</div>
-                        <div style="font-size: 4.5rem; font-family: 'Times New Roman', serif; font-weight: 900; color: var(--text-primary); line-height: 1;">${data.stats.subjects}</div>
+                        <div style="font-size: 0.75rem; font-weight: 800; color: #000000; text-transform: uppercase; letter-spacing: 1.5px; margin-bottom: 15px; font-family: var(--font-mono);">> Secured Domains</div>
+                        <div style="font-size: 4.5rem; font-family: 'Times New Roman', serif; font-weight: 900; color: #000000; line-height: 1;">${data.stats.subjects}</div>
                         <div style="font-size: 0.7rem; color: #228B22; font-weight: bold; margin-top: 15px; border-top: 1px solid rgba(139, 69, 19, 0.1); padding-top: 10px;">OPERATIONAL SUBJECTS</div>
                     </div>
                 `;
@@ -454,7 +485,15 @@
                             ],
                             borderWidth: 1,
                             borderColor: '#2C1E16',
-                            borderRadius: 6
+                            borderRadius: 6,
+                            hoverBackgroundColor: [
+                                '#DC143C',
+                                '#DAA520',
+                                '#5F9EA0',
+                                '#32CD32'
+                            ],
+                            hoverBorderColor: '#000',
+                            hoverBorderWidth: 2
                         }]
                     },
                     options: {
@@ -465,14 +504,30 @@
                                 display: false
                             },
                             tooltip: {
-                                backgroundColor: '#FCF5E5',
-                                titleColor: '#2C1E16',
-                                bodyColor: '#4A3320',
+                                enabled: true,
+                                backgroundColor: 'rgba(44, 30, 22, 0.95)',
+                                titleColor: '#FCF5E5',
+                                bodyColor: '#FCF5E5',
                                 borderColor: '#8B4513',
                                 borderWidth: 1,
-                                padding: 12
+                                cornerRadius: 10,
+                                padding: 14,
+                                titleFont: { size: 13, weight: 'bold' },
+                                bodyFont: { size: 12 },
+                                displayColors: true,
+                                boxPadding: 6,
+                                caretSize: 8,
+                                usePointStyle: true,
+                                animation: { duration: 200, easing: 'easeOutCubic' },
+                                callbacks: {
+                                    label: function(ctx) {
+                                        return ' ' + ctx.label + ': ' + ctx.raw + ' student' + (ctx.raw !== 1 ? 's' : '');
+                                    }
+                                }
                             }
                         },
+                        interaction: { mode: 'index', intersect: false },
+                        hover: { mode: 'index', intersect: false, animationDuration: 300 },
                         scales: {
                             y: { beginAtZero: true, grid: { color: 'rgba(139, 69, 19, 0.1)' }, ticks: { color: '#4A3320' } },
                             x: { grid: { display: false }, ticks: { color: '#2C1E16', font: { weight: 'bold' } } }
@@ -483,9 +538,16 @@
         }
 
         // 2. Students Logic
-        async function loadStudents() {
+        async function loadStudents(force = false) {
             try {
-                const res = await fetch('/admin/api/students');
+                if (force) document.getElementById('student-tbody').innerHTML = '<tr><td colspan="5" style="text-align: center;">Scanning records...</td></tr>';
+                const year = document.getElementById('studentFilterYear').value.trim();
+                const batch = document.getElementById('studentFilterBatch').value.trim();
+                const query = new URLSearchParams();
+                if (year) query.append('year', year);
+                if (batch) query.append('batch', batch);
+
+                const res = await fetch('/admin/api/students?' + query.toString());
                 const students = await res.json();
 
                 document.getElementById('student-count').innerText = `${students.length} IDENTITIES TRACKED`;
@@ -497,13 +559,13 @@
                     else if (s.risk_level === 'High') rBadge = 'badge-high';
                     else if (s.risk_level === 'Low') rBadge = 'badge-low';
 
-                    const flagHtml = s.burnout_flag ? `<span style="background:var(--accent); color:#fff; padding:2px 6px; border-radius:4px; font-size:0.7em;">Burnout Warning</span>` : '';
+                    const flagHtml = s.burnout_flag ? `<span style="background:var(--accent); color:#000000; padding:2px 6px; border-radius:4px; font-size:0.7em;">Burnout Warning</span>` : '';
 
                     html += `
                         <tr>
                             <td>
-                                <div style="font-weight: 800; color: var(--text-primary);">${s.name} ${flagHtml}</div>
-                                <div style="font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono);">${s.username}</div>
+                                <div style="font-weight: 800; color: #000000;">${s.name} ${flagHtml}</div>
+                                <div style="font-size: 0.7rem; color: #000000; font-family: var(--font-mono);">${s.username}</div>
                             </td>
                             <td style="font-family: var(--font-mono); font-size: 0.8rem;">
                                 ${s.year || '?'} / ${s.batch || '?'}
@@ -517,14 +579,16 @@
                                     <span style="font-size: 0.7rem; font-family: var(--font-mono);">${s.confidence}%</span>
                                 </div>
                             </td>
-                            <td style="font-size: 0.75rem; color: var(--text-muted); font-family: var(--font-mono);">
+                            <td style="font-size: 0.75rem; color: #000000; font-family: var(--font-mono);">
                                 <div style="display:flex; gap: 4px;">
                                     <button onclick="openStudentEditModal('${s.username}', '${s.name}', '${s.year || ''}', '${s.batch || ''}')"
-                                        class="btn-primary" style="padding:4px 8px; font-size:0.6rem; border-radius:4px; background:var(--bg-secondary); border:1px solid var(--glass-border);" title="Edit Info">✎</button>
+                                        class="btn-primary" style="padding:4px 8px; font-size:0.6rem; border-radius:4px; background:var(--bg-secondary); border:1px solid var(--glass-border);" title="Edit Info">âœŽ</button>
                                     <button onclick="deleteStudentAdmin('${s.username}')"
-                                        class="btn-primary" style="padding:4px 8px; font-size:0.6rem; border-radius:4px; background:rgba(248,113,113,0.1); color:var(--danger); border:1px solid rgba(248,113,113,0.3);" title="Delete Student">×</button>
+                                        class="btn-primary" style="padding:4px 8px; font-size:0.6rem; border-radius:4px; background:rgba(248,113,113,0.1); color:var(--danger); border:1px solid rgba(248,113,113,0.3);" title="Delete Student">Ã—</button>
+                                    <!-- We do not have /admin/student/:username endpoint currently. Hide or comment out Report.
                                     <a href="/admin/student/${s.username}"
                                         class="btn-primary" style="padding:4px 8px; font-size:0.6rem; border-radius:4px; font-weight:800; text-decoration:none;" title="Full Report">View Report</a>
+                                    -->
                                 </div>
                             </td>
                         </tr>
@@ -546,16 +610,16 @@
                     html += `
                         <tr>
                             <td>
-                                <div style="font-weight: 800; color: var(--text-primary);">${f.name}</div>
-                                <div style="font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono);">${f.username}</div>
+                                <div style="font-weight: 800; color: #000000;">${f.name}</div>
+                                <div style="font-size: 0.7rem; color: #000000; font-family: var(--font-mono);">${f.username}</div>
                             </td>
                             <td>
                                 <div style="font-weight: 600;">${f.subject_name}</div>
                                 <div style="font-size: 0.65rem; color: var(--cyan); font-family: var(--font-mono);">${f.subject_code}</div>
                             </td>
-                            <td style="font-size: 1.1rem; font-weight: 700; color: var(--text-primary); text-align: center;">${f.active_students}</td>
+                            <td style="font-size: 1.1rem; font-weight: 700; color: #000000; text-align: center;">${f.active_students}</td>
                             <td>
-                                <span class="badge" style="background: rgba(0,0,0,0.05); color: var(--text-muted);">${f.avg_risk}</span>
+                                <span class="badge" style="background: rgba(0,0,0,0.05); color: #000000;">${f.avg_risk}</span>
                             </td>
                             <td style="text-align: center; color: var(--accent); font-weight: 700;">${f.doubt_volume}</td>
                             <td>
@@ -603,17 +667,17 @@
                                 ${m.subject_code || 'GLOBAL NETWORK'}
                             </td>
                             <td>
-                                <div style="font-weight: 700; color: var(--text-primary);">${m.sender_name || m.sender_id || 'System'} ${burnoutHtml}</div>
+                                <div style="font-weight: 700; color: #000000;">${m.sender_name || m.sender_id || 'System'} ${burnoutHtml}</div>
                                 <div style="margin-top: 5px;"><span class="badge ${rBadge}">${m.sender_risk}</span></div>
                             </td>
                             <td>
-                                <div style="color: var(--text-primary); line-height: 1.4; font-size: 0.85rem; padding: 4px; border-left: 2px solid var(--accent); white-space: pre-wrap; word-break: break-word;">${m.message}</div>
+                                <div style="color: #000000; line-height: 1.4; font-size: 0.85rem; padding: 4px; border-left: 2px solid var(--accent); white-space: pre-wrap; word-break: break-word;">${m.message}</div>
                                 ${m.tag ? `<span class="badge badge-neutral" style="margin-top: 5px; display: inline-block;">#${m.tag}</span>` : ''}
                             </td>
-                            <td style="font-size: 0.8rem; font-weight: 600; color: var(--text-muted);">
+                            <td style="font-size: 0.8rem; font-weight: 600; color: #000000;">
                                 ${m.receiver_name || m.receiver_id || 'OPEN BROADCAST'}
                             </td>
-                            <td style="font-family: var(--font-mono); font-size: 0.7rem; color: var(--text-muted);">
+                            <td style="font-family: var(--font-mono); font-size: 0.7rem; color: #000000;">
                                 ${m.sent_at}
                             </td>
                         </tr>
@@ -623,6 +687,135 @@
                 document.getElementById('chat-tbody').innerHTML = html;
             } catch (err) { console.error("Chat fetch err", err); }
         }
+
+        // 5. Admin Comms Logic
+        async function loadAdminComms() {
+            try {
+                const res = await fetch('/admin/api/comms');
+                if (!res.ok) { console.error('Comms fetch failed', res.status); return; }
+                const msgs = await res.json();
+                
+                const logDiv = document.getElementById('adminCommLog');
+                
+                if (!msgs || msgs.length === 0) {
+                    logDiv.innerHTML = '<div style="text-align:center; padding: 30px; font-family: var(--font-mono); font-size: 0.8rem; opacity:0.5;">No communications yet. Send a message to get started.</div>';
+                    return;
+                }
+
+                let html = '';
+                msgs.forEach(m => {
+                    const isMe = m.sender_id === 'admin';
+                    
+                    // Determine display name and label
+                    let topLabel = '';
+                    if (isMe) {
+                        const toLabel = m.receiver_name || m.receiver_id || ({
+                            'BROADCAST_ALL': 'ðŸ“¢ All Faculty & Students',
+                            'BROADCAST_FACULTY': 'ðŸŽ“ All Faculty',
+                            'BROADCAST_STUDENTS': 'ðŸ“š All Students',
+                            'DIRECT_ADMIN': m.receiver_name || m.receiver_id || 'Direct'
+                        }[m.subject_code]) || m.subject_code || 'Broadcast';
+                        topLabel = `<span style="font-size: 0.6rem; color: rgba(139, 69, 19, 0.6);">You â†’ ${toLabel}</span>`;
+                    } else {
+                        const fromLabel = m.sender_name || m.sender_id || 'Unknown';
+                        const isBroadcast = ['BROADCAST_ALL', 'BROADCAST_FACULTY', 'BROADCAST_STUDENTS'].includes(m.subject_code);
+                        topLabel = `<span style="font-size: 0.6rem; color: ${isBroadcast ? '#B22222' : 'rgba(139, 69, 19, 0.7)'}; font-weight: bold;">${isBroadcast ? 'ðŸ“¢ Broadcast from ' : ''}${fromLabel}</span>`;
+                    }
+
+                    const bubbleBg = isMe ? 'linear-gradient(135deg, #8B4513, #A0522D)' : '#ffffff';
+                    const bubbleColor = isMe ? '#fff' : '#2C1E16';
+                    const bubbleBorder = isMe ? 'none' : '1px solid rgba(139, 69, 19, 0.15)';
+                    const align = isMe ? 'flex-end' : 'flex-start';
+                    const borderRadius = isMe ? '18px 18px 4px 18px' : '18px 18px 18px 4px';
+                    const shadow = isMe ? '0 2px 8px rgba(139,69,19,0.3)' : '0 2px 8px rgba(0,0,0,0.08)';
+
+                    const tagHtml = m.tag ? `<div style="margin-top: 4px;"><span style="background: rgba(255,255,255,0.2); font-size: 0.6rem; padding: 2px 6px; border-radius: 10px;">#${m.tag}</span></div>` : '';
+
+                    const time = m.sent_at ? new Date(m.sent_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
+
+                    html += `
+                        <div style="display: flex; flex-direction: column; align-items: ${align}; margin-bottom: 16px; width: 100%;">
+                            <div style="margin-bottom: 3px; padding: 0 4px;">${topLabel}</div>
+                            <div style="background: ${bubbleBg}; color: ${bubbleColor}; border: ${bubbleBorder};
+                                        padding: 10px 16px; border-radius: ${borderRadius};
+                                        max-width: 75%; font-size: 0.88rem; word-wrap: break-word;
+                                        line-height: 1.5; box-shadow: ${shadow}; position: relative;">
+                                ${m.message}
+                                ${tagHtml}
+                                <div style="font-size: 0.58rem; text-align: right; margin-top: 5px; opacity: 0.65;">
+                                    ${time} ${isMe ? '<span style="color: #90EE90;">âœ“âœ“</span>' : ''}
+                                </div>
+                            </div>
+                        </div>
+                    `;
+                });
+                
+                logDiv.innerHTML = html;
+                // Auto-scroll to latest message
+                setTimeout(() => { logDiv.scrollTop = logDiv.scrollHeight; }, 50);
+            } catch (err) {
+                console.error('Admin comms error:', err);
+                document.getElementById('adminCommLog').innerHTML = '<div style="color:red; padding:10px;">Error loading messages. Check console.</div>';
+            }
+        }
+        
+        function toggleAdminCommUserField() {
+            const val = document.getElementById('adminCommTarget').value;
+            if (val === 'INDIVIDUAL') {
+                document.getElementById('adminCommUserGroup').style.display = 'block';
+                document.getElementById('adminCommUserId').required = true;
+            } else {
+                document.getElementById('adminCommUserGroup').style.display = 'none';
+                document.getElementById('adminCommUserId').required = false;
+            }
+        }
+        
+        document.getElementById('adminCommForm').onsubmit = async (e) => {
+            e.preventDefault();
+            const target = document.getElementById('adminCommTarget').value;
+            const message = document.getElementById('adminCommPayload').value;
+            let receiver_id = "";
+            let subject_code = target;
+            
+            if (target === 'INDIVIDUAL') {
+                subject_code = 'DIRECT_ADMIN';
+                receiver_id = document.getElementById('adminCommUserId').value;
+            }
+            
+            const fd = new FormData();
+            fd.append("message", message);
+            fd.append("subject_code", subject_code);
+            if (receiver_id) fd.append("receiver_id", receiver_id);
+            
+            // Optimistic UX
+            const btn = e.target.querySelector('button[type="submit"]');
+            const origText = btn.innerText;
+            btn.disabled = true; btn.innerText = 'Sending...';
+            document.getElementById('adminCommPayload').value = '';
+
+            try {
+                const res = await fetch('/api/messages/send', { method: 'POST', body: fd });
+                if (res.ok) {
+                    await loadAdminComms();
+                } else {
+                    alert("Transmission error.");
+                    document.getElementById('adminCommPayload').value = message;
+                }
+            } catch(e) {
+                alert("Failed to secure transmission.");
+            } finally {
+                btn.disabled = false; btn.innerText = origText;
+            }
+        };
+
+        // Auto-refresh comms log every 15s when comms tab is active
+        let commsPoller = null;
+        const _switchTab = switchTab;
+        switchTab = function(tabId, el) {
+            _switchTab(tabId, el);
+            if (commsPoller) { clearInterval(commsPoller); commsPoller = null; }
+            if (tabId === 'comms') commsPoller = setInterval(loadAdminComms, 15000);
+        };
 
         // Modal Controls
         function openFacultyModal() {

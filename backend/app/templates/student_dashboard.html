@@ -26,7 +26,7 @@
             </div>
             <div class="user-info">
                 <h1 style="display: flex; align-items: center; gap: 8px;">AGMIS <span
-                        style="font-weight: 400; color: var(--text-muted); font-size: 1rem;">|</span> {{ user.name }}
+                        style="font-weight: 400; color: #000000; font-size: 1rem;">|</span> {{ user.name }}
                 </h1>
                 <span class="batch-tag">Terminal#2-510 | {{ user.batch }} | {{ user.department }}</span>
             </div>
@@ -44,193 +44,184 @@
         </div>
         <div style="display: flex; gap: 15px; align-items: center;">
             <button onclick="openDoubtSessions()" class="btn-primary"
-                style="padding: 8px 20px; font-size: 0.8rem; background: rgba(99, 102, 241, 0.15); border: 1px solid var(--accent); color: #fff;">
+                style="padding: 8px 20px; font-size: 0.8rem; background: rgba(99, 102, 241, 0.15); border: 1px solid var(--accent); color: #000000;">
                 Doubt Sessions 💬
             </button>
             {% if is_admin %}
             <a href="/admin/dashboard" class="btn-primary"
-                style="padding: 8px 20px; font-size: 0.8rem; background: var(--bg-primary); color: var(--text-secondary);">Back
+                style="padding: 8px 20px; font-size: 0.8rem; background: var(--bg-primary); color: #000000;">Back
                 to Admin</a>
             {% else %}
             <a href="/logout" class="btn-primary"
-                style="padding: 8px 20px; font-size: 0.8rem; background: var(--bg-primary); color: var(--text-secondary);">System
+                style="padding: 8px 20px; font-size: 0.8rem; background: var(--bg-primary); color: #000000;">System
                 Logout</a>
             {% endif %}
         </div>
     </div>
 
-    <div class="container">
-        <div class="dashboard-grid">
-            <!-- Main Analytics Column -->
-            <div class="main-column">
-                <div class="stats-grid" style="grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));">
-                    <div class="card">
-                        <h3>Current Status</h3>
-                        <p class="stat-value" style="font-size: 2rem; color: var(--cyan);">{{ performance.category }}
-                        </p>
-                        <div style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted);">
-                            Index: <span style="color: var(--text-primary); font-weight: bold;">{{
-                                performance.weighted_score }}%</span>
+    <div class="container" style="max-width: 1400px; margin: 0 auto; padding: 20px 24px;">
+
+        <!-- Top Stats Row -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 24px;">
+
+            <div class="card" style="padding: 20px; border-radius: 12px; border-left: 4px solid #8B4513; transition: transform 0.2s; cursor: default;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 0.7rem; font-weight: 700; color: #8B4513; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">📊 Current Status</div>
+                <div style="font-size: 1.8rem; font-weight: 800; color: #2C1E16; line-height: 1;">{{ performance.category }}</div>
+                <div style="font-size: 0.8rem; color: #6B4226; margin-top: 6px;">Score Index: <strong>{{ performance.weighted_score }}%</strong></div>
+            </div>
+
+            <div class="card" style="padding: 20px; border-radius: 12px; border-left: 4px solid {% if prediction.score >= 70 %}#22c55e{% elif prediction.score >= 50 %}#f59e0b{% else %}#ef4444{% endif %}; transition: transform 0.2s; cursor: default;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 0.7rem; font-weight: 700; color: #8B4513; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">🎯 Predicted Score</div>
+                <div style="font-size: 1.8rem; font-weight: 800; color: {% if prediction.score >= 70 %}#22c55e{% elif prediction.score >= 50 %}#f59e0b{% else %}#ef4444{% endif %}; line-height: 1;">{{ prediction.score }}%</div>
+                <div style="font-size: 0.8rem; color: #6B4226; margin-top: 6px;">Confidence: <strong>{{ prediction.confidence }}%</strong></div>
+            </div>
+
+            {% if overall %}
+            <div class="card" style="padding: 20px; border-radius: 12px; border-left: 4px solid #6366f1; transition: transform 0.2s; cursor: default;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 0.7rem; font-weight: 700; color: #8B4513; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">⭐ Overall Score</div>
+                <div style="font-size: 1.8rem; font-weight: 800; color: #2C1E16; line-height: 1;">{{ overall.score }}%</div>
+                <div style="font-size: 0.8rem; color: #6B4226; margin-top: 6px;">Across all subjects</div>
+            </div>
+            {% endif %}
+
+            <div class="card" style="padding: 20px; border-radius: 12px; border-left: 4px solid #0891b2; transition: transform 0.2s; cursor: default;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 0.7rem; font-weight: 700; color: #8B4513; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">📚 Subjects</div>
+                <div style="font-size: 1.8rem; font-weight: 800; color: #2C1E16; line-height: 1;">{{ subjects | length }}</div>
+                <div style="font-size: 0.8rem; color: #6B4226; margin-top: 6px;">Enrolled subjects</div>
+            </div>
+
+            <div class="card" style="padding: 20px; border-radius: 12px; border-left: 4px solid #d97706; transition: transform 0.2s; cursor: pointer;" onclick="openDoubtSessions()" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 0.7rem; font-weight: 700; color: #8B4513; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">💬 Doubt Sessions</div>
+                <div style="font-size: 1.8rem; font-weight: 800; color: #2C1E16; line-height: 1;">Open</div>
+                <div style="font-size: 0.8rem; color: #6B4226; margin-top: 6px;">Click to chat with faculty</div>
+            </div>
+
+        </div>
+
+        <!-- Main 2-column layout -->
+        <div style="display: grid; grid-template-columns: 1fr 380px; gap: 20px; align-items: start;">
+
+            <!-- LEFT: Charts -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+
+                <!-- Growth Trajectory -->
+                <div class="card" style="padding: 24px; border-radius: 12px; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.06)';">
+                    <div style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 16px;">
+                        <div>
+                            <h3 style="margin: 0; font-size: 1rem; font-weight: 700; color: #2C1E16;">📈 Growth Trajectory</h3>
+                            <p style="margin: 4px 0 0 0; font-size: 0.75rem; color: #8B4513;">Weekly performance trend with predicted path</p>
                         </div>
                     </div>
-                    <div class="card"
-                        style="border-left: 4px solid {% if prediction.risk_tier == '🔴 High Risk' %}var(--danger){% elif prediction.risk_tier == '🟡 Moderate Risk' %}var(--warning){% elif prediction.risk_tier == '🟢 Stable' %}#4ade80{% else %}var(--cyan){% endif %}; position: relative; overflow: hidden;">
-                        <h3>Performance Prediction</h3>
-                        <p class="stat-value"
-                            style="font-size: 2rem; color: {% if prediction.risk_tier == '🔴 High Risk' %}var(--danger){% elif prediction.risk_tier == '🟡 Moderate Risk' %}var(--warning){% elif prediction.risk_tier == '🟢 Stable' %}#4ade80{% else %}var(--cyan){% endif %};">
-                            {{ prediction.score }}%</p>
-
-                        <div
-                            style="font-family: var(--font-mono); font-size: 0.8rem; color: var(--text-muted); display: flex; justify-content: space-between; align-items: center; margin-top: 15px; border-top: 1px solid rgba(0,0,0,0.1); padding-top: 10px;">
-                            <span>Risk Tier: <strong style="color: var(--text-primary);">{{ prediction.risk_tier
-                                    }}</strong></span>
-                            <span>Confidence: <strong style="color: var(--text-primary);">{{ prediction.confidence
-                                    }}%</strong></span>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="card">
-                    <h3>Growth Trajectory Analysis</h3>
-                    <div class="chart-img-wrap" style="height: 350px;">
+                    <div style="height: 280px; position: relative;">
                         <canvas id="trajectoryChart"></canvas>
                     </div>
                 </div>
 
-                <div class="charts-row">
-                    <div class="card">
-                        <h3>Metric Distribution</h3>
-                        <div class="chart-img-wrap" style="height: 300px;">
+                <!-- Two mini charts side by side -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="card" style="padding: 24px; border-radius: 12px; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.06)';">
+                        <h3 style="margin: 0 0 4px 0; font-size: 0.95rem; font-weight: 700; color: #2C1E16;">🥧 Metric Distribution</h3>
+                        <p style="margin: 0 0 14px 0; font-size: 0.72rem; color: #8B4513;">Attendance · Submissions · Internals</p>
+                        <div style="height: 220px;">
                             <canvas id="metricsPieChart"></canvas>
                         </div>
                     </div>
-                    <div class="card">
-                        <h3>Efficiency vs Target</h3>
-                        <div class="chart-img-wrap" style="height: 300px;">
+                    <div class="card" style="padding: 24px; border-radius: 12px; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(0,0,0,0.12)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.06)';">
+                        <h3 style="margin: 0 0 4px 0; font-size: 0.95rem; font-weight: 700; color: #2C1E16;">⚡ Efficiency vs Target</h3>
+                        <p style="margin: 0 0 14px 0; font-size: 0.72rem; color: #8B4513;">Your score vs 85% benchmark</p>
+                        <div style="height: 220px;">
                             <canvas id="comparisonChart"></canvas>
                         </div>
                     </div>
                 </div>
+
+                <!-- Study Materials + Events side by side -->
+                <div style="display: grid; grid-template-columns: 1fr 1fr; gap: 20px;">
+                    <div class="card" style="padding: 20px; border-radius: 12px;">
+                        <h3 style="margin: 0 0 14px 0; font-size: 0.95rem; font-weight: 700; color: #2C1E16;">📂 Study Materials</h3>
+                        {% if materials %}
+                        <div style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto;">
+                            {% for m in materials %}
+                            <a href="{{ m.url }}" target="_blank" download style="display: flex; align-items: center; justify-content: space-between; padding: 8px 12px; background: rgba(139,69,19,0.05); border-radius: 8px; border: 1px solid rgba(139,69,19,0.1); text-decoration: none; transition: background 0.2s;" onmouseover="this.style.background='rgba(139,69,19,0.12)'" onmouseout="this.style.background='rgba(139,69,19,0.05)'">
+                                <span style="font-size: 0.82rem; color: #2C1E16; font-weight: 600;">{{ m.title }}</span>
+                                <span style="font-size: 0.65rem; background: rgba(139,69,19,0.1); color: #8B4513; padding: 2px 8px; border-radius: 10px; font-weight: 700;">{{ m.type }}</span>
+                            </a>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p style="color: #8B4513; font-size: 0.82rem; text-align: center; padding: 20px 0; opacity: 0.7;">No materials uploaded yet.</p>
+                        {% endif %}
+                    </div>
+                    <div class="card" style="padding: 20px; border-radius: 12px;">
+                        <h3 style="margin: 0 0 14px 0; font-size: 0.95rem; font-weight: 700; color: #2C1E16;">📅 Upcoming Events</h3>
+                        {% if events %}
+                        <div style="display: flex; flex-direction: column; gap: 8px; max-height: 200px; overflow-y: auto;">
+                            {% for e in events %}
+                            <div style="padding: 8px 12px; background: rgba(139,69,19,0.05); border-radius: 8px; border: 1px solid rgba(139,69,19,0.1);">
+                                <div style="font-size: 0.82rem; color: #2C1E16; font-weight: 600;">{{ e.title }}</div>
+                                <div style="font-size: 0.7rem; color: #8B4513; margin-top: 3px; font-family: monospace;">📆 {{ e.event_date }}</div>
+                            </div>
+                            {% endfor %}
+                        </div>
+                        {% else %}
+                        <p style="color: #8B4513; font-size: 0.82rem; text-align: center; padding: 20px 0; opacity: 0.7;">No upcoming events.</p>
+                        {% endif %}
+                    </div>
+                </div>
+
             </div>
 
-            <!-- Intelligence Briefs Column -->
-            <div class="side-column">
-                <!-- Terminal Notifications -->
-                <div class="card">
-                    <h3>Terminal Intelligence Briefs</h3>
-                    <div class="table-scroll" style="max-height: 400px;">
+            <!-- RIGHT: Sidebar -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+
+                <!-- Notifications -->
+                <div class="card" style="padding: 20px; border-radius: 12px;">
+                    <h3 style="margin: 0 0 14px 0; font-size: 0.95rem; font-weight: 700; color: #2C1E16;">🔔 Notifications</h3>
+                    <div style="display: flex; flex-direction: column; gap: 10px; max-height: 220px; overflow-y: auto;">
                         {% for n in notifications %}
-                        <div class="intelligence-brief priority-{{ n.type | lower }}"
-                            style="margin-bottom: 12px; position: relative; padding-left: 15px;">
-                            <div
-                                style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 5px;">
-                                {% if n.type == 'alert' %}
-                                <span class="status-tag"
-                                    style="font-size: 0.6rem; background: rgba(248, 113, 113, 0.1); color: var(--danger);">
-                                    {{ n.type | upper }}
-                                </span>
-                                {% else %}
-                                <span class="status-tag"
-                                    style="font-size: 0.6rem; background: rgba(34, 211, 238, 0.1); color: var(--cyan);">
-                                    {{ n.type | upper }}
-                                </span>
-                                {% endif %}
-                                <span
-                                    style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted);">{{
-                                    n.created_at }}</span>
+                        <div style="padding: 10px 12px; border-radius: 8px; background: {% if n.type == 'alert' %}rgba(239,68,68,0.06){% else %}rgba(99,102,241,0.06){% endif %}; border-left: 3px solid {% if n.type == 'alert' %}#ef4444{% else %}#6366f1{% endif %};">
+                            <div style="display: flex; justify-content: space-between; align-items: flex-start; gap: 8px;">
+                                <span style="font-size: 0.8rem; color: #2C1E16; font-weight: 600; line-height: 1.4;">{{ n.message }}</span>
+                                <span style="font-size: 0.6rem; background: {% if n.type == 'alert' %}rgba(239,68,68,0.12){% else %}rgba(99,102,241,0.12){% endif %}; color: {% if n.type == 'alert' %}#ef4444{% else %}#6366f1{% endif %}; padding: 2px 7px; border-radius: 10px; font-weight: 700; white-space: nowrap; flex-shrink: 0;">{{ n.type | upper }}</span>
                             </div>
-                            <div
-                                style="font-size: 0.85rem; color: var(--text-primary); line-height: 1.4; font-weight: bold;">
-                                {{ n.message }}</div>
-                            {% if n.subject_code %}
-                            <div
-                                style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--cyan); margin-top: 5px; opacity: 0.8;">
-                                SOURCE: {{ n.subject_code }}</div>
-                            {% endif %}
+                            {% if n.subject_code %}<div style="font-size: 0.65rem; color: #8B4513; margin-top: 4px;">{{ n.subject_code }}</div>{% endif %}
                         </div>
                         {% else %}
-                        <div style="text-align: center; padding: 20px; color: var(--text-muted);">
-                            <p>No new system notifications.</p>
-                        </div>
+                        <p style="color: #8B4513; font-size: 0.82rem; text-align: center; padding: 14px 0; opacity: 0.7;">✅ No new notifications</p>
                         {% endfor %}
                     </div>
                 </div>
 
-                <div class="card">
-                    <h3>Personalized Intelligence</h3>
-                    <div class="table-scroll" style="max-height: 400px;">
+                <!-- Personalized Guidance -->
+                <div class="card" style="padding: 20px; border-radius: 12px;">
+                    <h3 style="margin: 0 0 14px 0; font-size: 0.95rem; font-weight: 700; color: #2C1E16;">🧠 Personalized Guidance</h3>
+                    <div style="display: flex; flex-direction: column; gap: 12px; max-height: 420px; overflow-y: auto;">
                         {% for msg in guidance %}
-                        <div class="intelligence-brief priority-{{ msg.priority | lower }}"
-                            style="margin-bottom: 12px;">
-                            <div class="brief-header">
-                                <span class="brief-priority priority-{{ msg.priority }}">{{ msg.priority }}</span>
+                        <div style="padding: 12px 14px; border-radius: 10px; background: {% if msg.priority == 'Critical' %}rgba(239,68,68,0.06){% elif msg.priority == 'High' %}rgba(245,158,11,0.06){% else %}rgba(99,102,241,0.06){% endif %}; border: 1px solid {% if msg.priority == 'Critical' %}rgba(239,68,68,0.2){% elif msg.priority == 'High' %}rgba(245,158,11,0.2){% else %}rgba(99,102,241,0.15){% endif %};">
+                            <div style="display: flex; align-items: center; gap: 6px; margin-bottom: 7px;">
+                                <span style="font-size: 0.65rem; padding: 2px 8px; border-radius: 10px; font-weight: 800; background: {% if msg.priority == 'Critical' %}rgba(239,68,68,0.15){% elif msg.priority == 'High' %}rgba(245,158,11,0.15){% else %}rgba(99,102,241,0.15){% endif %}; color: {% if msg.priority == 'Critical' %}#ef4444{% elif msg.priority == 'High' %}#f59e0b{% else %}#6366f1{% endif %};">{{ msg.priority | upper }}</span>
                             </div>
-                            <div class="brief-observation">{{ msg.observation }}</div>
-                            <div class="brief-action">{{ msg.action }}</div>
-                            <div class="brief-footer">
-                                <span>Impact: <strong>{{ msg.impact }}</strong></span>
-                                <span>Target: <strong>{{ msg.deadline }}</strong></span>
+                            <p style="margin: 0 0 6px 0; font-size: 0.82rem; color: #2C1E16; font-weight: 600; line-height: 1.45;">{{ msg.observation }}</p>
+                            <p style="margin: 0 0 8px 0; font-size: 0.77rem; color: #6B4226; line-height: 1.45;">{{ msg.action }}</p>
+                            <div style="display: flex; justify-content: space-between; font-size: 0.68rem; color: #8B4513; border-top: 1px solid rgba(139,69,19,0.1); padding-top: 7px; margin-top: 4px;">
+                                <span>💡 {{ msg.impact }}</span>
+                                <span style="font-weight: 700;">⏰ {{ msg.deadline }}</span>
                             </div>
                         </div>
                         {% else %}
-                        <div style="text-align: center; padding: 20px; color: var(--text-muted);">
-                            <p>STABLE: No critical intervention required.</p>
+                        <div style="text-align: center; padding: 24px 0;">
+                            <div style="font-size: 2rem; margin-bottom: 8px;">✅</div>
+                            <p style="color: #8B4513; font-size: 0.85rem; font-weight: 600;">All systems stable.<br>Keep up the great work!</p>
                         </div>
                         {% endfor %}
                     </div>
                 </div>
 
-                <!-- Study Materials -->
-                <div class="card">
-                    <h3>Study Materials</h3>
-                    <div class="table-scroll">
-                        <table class="styled-table">
-                            <thead>
-                                <tr>
-                                    <th>Title</th>
-                                    <th>Type</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for m in materials %}
-                                <tr>
-                                    <td><a href="{{ m.url }}" target="_blank" download style="color: var(--cyan);">{{
-                                            m.title }}</a></td>
-                                    <td><span class="status-tag">{{ m.type }}</span></td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Deadlines & Calendar -->
-                <div class="card">
-                    <h3>Upcoming Deadlines & Events</h3>
-                    <div class="table-scroll">
-                        <table class="styled-table">
-                            <thead>
-                                <tr>
-                                    <th>Event</th>
-                                    <th>Date</th>
-                                </tr>
-                            </thead>
-                            <tbody>
-                                {% for e in events %}
-                                <tr>
-                                    <td>{{ e.title }}</td>
-                                    <td style="font-family: var(--font-mono);">{{ e.event_date }}</td>
-                                </tr>
-                                {% endfor %}
-                            </tbody>
-                        </table>
-                    </div>
-                </div>
-
-                <!-- Removed legacy messaging block to prefer real-time Doubt Sessions. -->
             </div>
         </div>
     </div>
+
+    
     <script id="chart-data" type="application/json">{{ chart_data | tojson | safe }}</script>
     <!-- Doubt Sessions Overlay -->
     <div id="doubtSessionsOverlay"
@@ -242,20 +233,22 @@
             <div
                 style="width: 250px; background: rgba(15,23,42,0.5); border-right: 1px solid var(--glass-border); display: flex; flex-direction: column;">
                 <div style="padding: 20px; border-bottom: 1px solid var(--glass-border);">
-                    <h3 style="margin: 0; color: #fff; font-size: 1rem;">Doubt Sessions</h3>
-                    <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 5px;">Select a subject</div>
+                    <h3 style="margin: 0; color: #000000; font-size: 1rem;">Doubt Sessions</h3>
+                    <div style="font-size: 0.7rem; color: #000000; margin-top: 5px;">Select a subject</div>
                 </div>
                 <div id="subjectListContainer"
                     style="flex: 1; overflow-y: auto; padding: 10px; display: flex; flex-direction: column; gap: 10px;">
                     <div class="subject-chat-btn active" onclick="selectChatSubject('GLOBAL', this)"
-                        style="padding: 10px 15px; border-radius: 8px; cursor: pointer; background: var(--bg-primary); border: 1px solid var(--accent); color: var(--text-primary); font-size: 0.85rem; transition: 0.2s;">
+                        style="padding: 10px 15px; border-radius: 8px; cursor: pointer; background: var(--bg-primary); border: 1px solid var(--accent); color: #000000; font-size: 0.85rem; transition: 0.2s;">
                         GLOBAL
                     </div>
                     {% for s in subjects %}
+                    {% if s.subject and s.subject not in ['Subject', 'subject', 'Unknown', 'Overall', 'N/A'] %}
                     <div class="subject-chat-btn" onclick="selectChatSubject('{{ s.subject }}', this)"
-                        style="padding: 10px 15px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; color: var(--text-secondary); font-size: 0.85rem; transition: 0.2s;">
+                        style="padding: 10px 15px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; color: #000000; font-size: 0.85rem; transition: 0.2s;">
                         {{ s.subject }}
                     </div>
+                    {% endif %}
                     {% endfor %}
                 </div>
             </div>
@@ -266,23 +259,23 @@
                 <div
                     style="padding: 15px 20px; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; background: rgba(30, 41, 59, 0.5);">
                     <div style="display: flex; align-items: center; gap: 10px;">
-                        <span id="chatSubjectName" style="color: #fff; font-weight: 600;">GLOBAL</span>
+                        <span id="chatSubjectName" style="color: #000000; font-weight: 600;">GLOBAL</span>
                         <span class="status-tag"
                             style="background: rgba(99, 102, 241, 0.1); border: 1px solid var(--accent); font-size: 0.65rem;">Active
                             Support</span>
                     </div>
                     <div style="display: flex; gap: 10px;">
                         <button onclick="summarizeChat()" class="btn-primary"
-                            style="padding: 6px 12px; font-size: 0.7rem; background: rgba(168, 85, 247, 0.2); border: 1px solid #a855f7; color: #fff;">Summarize</button>
+                            style="padding: 6px 12px; font-size: 0.7rem; background: rgba(168, 85, 247, 0.2); border: 1px solid #a855f7; color: #000000;">Summarize</button>
                         <button onclick="closeDoubtSessions()"
-                            style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem;">&times;</button>
+                            style="background: transparent; border: none; color: #000000; cursor: pointer; font-size: 1.2rem;">&times;</button>
                     </div>
                 </div>
 
                 <!-- Chat Area -->
                 <div id="chatMessagesArea"
                     style="flex: 1; overflow-y: auto; padding: 20px; display: flex; flex-direction: column; gap: 15px;">
-                    <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-top: 20px;">
+                    <div style="text-align: center; color: #000000; font-size: 0.8rem; margin-top: 20px;">
                         Messages are end-to-end monitored by Academic Faculty.
                     </div>
                 </div>
@@ -292,7 +285,7 @@
                     <form id="doubtForm" style="display: flex; flex-direction: column; gap: 10px;">
                         <input type="hidden" name="subject_code" id="hiddenSubjectCode" value="GLOBAL">
                         <select name="tag" class="input-field"
-                            style="padding: 8px; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: var(--text-secondary);"
+                            style="padding: 8px; font-size: 0.8rem; background: rgba(0,0,0,0.3); border: 1px solid var(--glass-border); color: #000000;"
                             required>
                             <option value="">Select Priority Tag...</option>
                             <option value="Concept Doubt">📌 Concept Doubt</option>
@@ -315,324 +308,317 @@
 
     <script>
         document.addEventListener('DOMContentLoaded', function () {
-            // Real-Time Sync: AJAX Auto-Refresh every 30 seconds
-            setInterval(async () => {
-                console.log("Terminal Sync: Fetching latest intelligence...");
-                location.reload(); // Lightweight refresh to ensure latest DB state
-            }, 30000);
-
             // Register DataLabels
             if (typeof ChartDataLabels !== 'undefined') {
                 Chart.register(ChartDataLabels);
             }
 
-            // Global Chart.js Defaults for Professional Cyber Aesthetics
+            // Set global chart defaults
             Object.assign(Chart.defaults, {
-                font: {
-                    family: "'Times New Roman', Times, serif",
-                    size: 11
-                },
+                font: { family: "'Times New Roman', Times, serif", size: 11 },
                 color: '#4A3320',
                 responsive: true,
                 maintainAspectRatio: false,
-                animation: {
-                    duration: 2000,
-                    easing: 'easeOutQuart'
-                },
+                animation: { duration: 1500, easing: 'easeOutQuart' },
                 plugins: {
-                    legend: {
-                        labels: {
-                            usePointStyle: true,
-                            padding: 20,
-                            font: { size: 12, weight: '500' }
-                        }
-                    },
+                    legend: { labels: { usePointStyle: true, padding: 16, font: { size: 11, weight: '500' } } },
                     tooltip: {
-                        backgroundColor: '#FCF5E5',
-                        titleColor: '#2C1E16',
-                        bodyColor: '#4A3320',
-                        borderColor: '#8B4513',
-                        titleFont: { size: 13, weight: 'bold' },
-                        bodyFont: { size: 12 },
-                        padding: 12,
-                        cornerRadius: 8,
-                        borderWidth: 1,
-                        displayColors: true
+                        backgroundColor: '#FCF5E5', titleColor: '#2C1E16', bodyColor: '#4A3320',
+                        borderColor: '#8B4513', borderWidth: 1,
+                        titleFont: { size: 12, weight: 'bold' }, bodyFont: { size: 11 }
                     }
                 }
             });
 
-            const chartDataEl = document.getElementById('chart-data');
-            if (!chartDataEl) return;
-            const chartData = JSON.parse(chartDataEl.textContent);
+            const raw = document.getElementById('chart-data');
+            if (!raw) return;
+            const chartData = JSON.parse(raw.textContent);
+            const weeks = chartData.trend_weeks || [];
+            const actual = chartData.actual_scores || [];
+            const predicted = chartData.predicted_path || [];
+            const [att, sub, intern] = chartData.metrics || [0, 0, 0];
 
-            const colors = {
-                accent: '#6366f1',       /* Indigo Neon */
-                accentLight: 'rgba(99, 102, 241, 0.15)',
-                cyan: '#22d3ee',
-                attendance: '#818cf8',   /* Indigo variant */
-                submission: '#2dd4bf',   /* Vibrant Teal */
-                internal: '#fbbf24',     /* Vibrant Amber */
-                excellent: '#10b981',
-                good: '#3b82f6',
-                average: '#f59e0b',
-                at_risk: '#f97316',
-                critical: '#ef4444'
-            };
-
-            // 1. Growth Trajectory Analysis
-            const ctxTrajectory = document.getElementById('trajectoryChart');
-            if (ctxTrajectory) {
-                const ctx = ctxTrajectory.getContext('2d');
-                const areaGradient = ctx.createLinearGradient(0, 0, 0, 400);
-                areaGradient.addColorStop(0, 'rgba(99, 102, 241, 0.35)');
-                areaGradient.addColorStop(1, 'rgba(15, 23, 42, 0)');
-
-                new Chart(ctx, {
+            // Growth Trajectory Chart
+            const trajCtx = document.getElementById('trajectoryChart');
+            if (trajCtx) {
+                const targetLine = Array(weeks.length).fill(85);
+                new Chart(trajCtx, {
                     type: 'bar',
                     data: {
-                        labels: chartData.trend_weeks,
+                        labels: weeks.map(w => w + '(P)'),
                         datasets: [
                             {
                                 type: 'bar',
-                                label: 'Actual',
-                                data: chartData.actual_scores,
-                                backgroundColor: '#4682B4', // Steel Blue
-                                borderColor: '#2C1E16',
-                                borderWidth: 1,
-                                borderRadius: 4,
-                                datalabels: {
-                                    display: true,
-                                    color: '#4A3320',
-                                    font: { weight: '900', size: 10, family: 'var(--font-mono)' },
-                                    anchor: 'end',
-                                    align: 'top',
-                                    offset: 4,
-                                    formatter: (v) => v + '%'
-                                }
+                                label: 'Actual Score',
+                                data: actual,
+                                backgroundColor: 'rgba(99,102,241,0.6)',
+                                hoverBackgroundColor: 'rgba(99,102,241,0.9)',
+                                borderRadius: 4
                             },
                             {
                                 type: 'line',
-                                label: 'Predicted Projection',
-                                data: chartData.predicted_path.map((v, i) => i < chartData.actual_scores.length - 1 ? null : v),
-                                borderColor: '#B22222', // Firebrick
-                                borderWidth: 3,
-                                pointBackgroundColor: '#B22222',
-                                pointBorderColor: '#FCF5E5',
-                                pointRadius: 5,
-                                pointHoverRadius: 9,
-                                tension: 0.35,
-                                fill: false,
-                                segment: { borderDash: [6, 4] },
-                                datalabels: {
-                                    display: true,
-                                    backgroundColor: '#B22222',
-                                    borderRadius: 4,
-                                    color: '#fff',
-                                    font: { weight: '900', size: 10, family: 'var(--font-mono)' },
-                                    padding: 4,
-                                    align: 'top',
-                                    offset: 8,
-                                    formatter: (v) => v ? v + '%' : ''
-                                }
+                                label: 'Predicted Path',
+                                data: predicted,
+                                borderColor: '#f59e0b',
+                                backgroundColor: 'transparent',
+                                borderWidth: 2,
+                                pointRadius: 4,
+                                pointHoverRadius: 8,
+                                pointHoverBackgroundColor: '#f59e0b',
+                                pointHoverBorderColor: '#fff',
+                                pointHoverBorderWidth: 3,
+                                tension: 0.4
+                            },
+                            {
+                                type: 'line',
+                                label: 'Target (85%)',
+                                data: targetLine,
+                                borderColor: '#ef4444',
+                                backgroundColor: 'transparent',
+                                borderWidth: 1.5,
+                                borderDash: [6, 3],
+                                pointRadius: 0
                             }
                         ]
                     },
                     options: {
+                        responsive: true, maintainAspectRatio: false,
+                        scales: {
+                            y: { min: 0, max: 110, grid: { color: 'rgba(0,0,0,0.06)' }, ticks: { color: '#4A3320' } },
+                            x: { grid: { display: false }, ticks: { color: '#4A3320' } }
+                        },
                         plugins: {
-                            legend: { display: false },
+                            datalabels: { display: false },
+                            legend: { position: 'top', labels: { usePointStyle: true, padding: 15, color: '#4A3320' } },
                             tooltip: {
-                                backgroundColor: '#FCF5E5',
-                                callbacks: {
-                                    label: (ctx) => {
-                                        return ctx.dataset.label.toUpperCase() + ': ' + ctx.parsed.y + '%';
-                                    }
-                                }
+                                enabled: true,
+                                backgroundColor: 'rgba(44, 30, 22, 0.95)',
+                                titleColor: '#FCF5E5',
+                                bodyColor: '#FCF5E5',
+                                borderColor: '#8B4513',
+                                borderWidth: 1,
+                                cornerRadius: 10,
+                                padding: 14,
+                                titleFont: { size: 13, weight: 'bold', family: "'Plus Jakarta Sans', sans-serif" },
+                                bodyFont: { size: 12, family: "'Plus Jakarta Sans', sans-serif" },
+                                displayColors: true,
+                                boxPadding: 6,
+                                caretSize: 8,
+                                caretPadding: 10,
+                                usePointStyle: true,
+                                animation: { duration: 200, easing: 'easeOutCubic' }
                             }
                         },
-                        scales: {
-                            y: {
-                                min: 0, max: 110,
-                                grid: { color: 'rgba(139, 69, 19, 0.05)', drawBorder: false },
-                                ticks: { color: '#4A3320', font: { family: 'var(--font-mono)' } }
-                            },
-                            x: {
-                                grid: { display: false },
-                                ticks: { color: '#2C1E16', font: { weight: '800' } }
-                            }
-                        }
+                        interaction: { mode: 'index', intersect: false },
+                        hover: { mode: 'index', intersect: false, animationDuration: 300 }
                     }
                 });
             }
 
-            // 2. Metric Intelligence Map (Doughnut)
-            const ctxMetrics = document.getElementById('metricsPieChart');
-            if (ctxMetrics) {
-                new Chart(ctxMetrics.getContext('2d'), {
+            // Pie Chart
+            const pieCtx = document.getElementById('metricsPieChart');
+            if (pieCtx) {
+                new Chart(pieCtx, {
                     type: 'doughnut',
                     data: {
                         labels: ['Attendance', 'Submissions', 'Internals'],
                         datasets: [{
-                            data: chartData.metrics,
-                            backgroundColor: [colors.attendance, colors.submission, colors.internal],
-                            borderColor: 'rgba(15, 23, 42, 1)',
-                            borderWidth: 2,
-                            hoverOffset: 10,
-                            borderRadius: 8
+                            data: [att, sub, intern],
+                            backgroundColor: ['rgba(99,102,241,0.8)', 'rgba(245,158,11,0.8)', 'rgba(34,197,94,0.8)'],
+                            borderWidth: 0,
+                            hoverOffset: 18,
+                            hoverBorderWidth: 3,
+                            hoverBorderColor: '#FCF5E5'
                         }]
                     },
                     options: {
+                        responsive: true, maintainAspectRatio: false, cutout: '60%',
                         plugins: {
-                            legend: { position: 'bottom' },
                             datalabels: {
-                                color: '#fff',
-                                font: { weight: '900', size: 12, family: 'var(--font-mono)' },
-                                formatter: (v, ctx) => {
-                                    const label = ctx.chart.data.labels[ctx.dataIndex];
-                                    return label + '\\n' + v + '%';
-                                },
-                                textAlign: 'center',
-                                backgroundColor: 'rgba(139, 69, 19, 0.8)',
-                                borderRadius: 4,
-                                padding: 4
+                                color: '#fff', font: { weight: 'bold', size: 11 },
+                                formatter: v => v > 0 ? v + '%' : ''
+                            },
+                            legend: { position: 'bottom', labels: { usePointStyle: true, padding: 12, color: '#4A3320' } },
+                            tooltip: {
+                                enabled: true,
+                                backgroundColor: 'rgba(44, 30, 22, 0.95)',
+                                titleColor: '#FCF5E5',
+                                bodyColor: '#FCF5E5',
+                                borderColor: '#8B4513',
+                                borderWidth: 1,
+                                cornerRadius: 10,
+                                padding: 14,
+                                titleFont: { size: 13, weight: 'bold', family: "'Plus Jakarta Sans', sans-serif" },
+                                bodyFont: { size: 12, family: "'Plus Jakarta Sans', sans-serif" },
+                                displayColors: true,
+                                boxPadding: 6,
+                                caretSize: 8,
+                                caretPadding: 10,
+                                usePointStyle: true,
+                                animation: { duration: 200, easing: 'easeOutCubic' }
                             }
-                        }
+                        },
+                        hover: { animationDuration: 300 }
                     }
                 });
             }
 
-            // 3. Efficiency vs Target
-            const ctxComparison = document.getElementById('comparisonChart');
-            if (ctxComparison) {
-                new Chart(ctxComparison.getContext('2d'), {
+            // Bar Comparison Chart
+            const barCtx = document.getElementById('comparisonChart');
+            if (barCtx) {
+                new Chart(barCtx, {
                     type: 'bar',
                     data: {
                         labels: ['Attendance', 'Submissions', 'Internals'],
                         datasets: [
-                            {
-                                label: 'Current',
-                                data: chartData.metrics,
-                                backgroundColor: [colors.attendance, colors.submission, colors.internal],
-                                borderRadius: 10,
-                                borderWidth: 2,
-                                borderColor: 'rgba(255,255,255,0.1)'
-                            },
-                            {
-                                label: 'Target',
-                                data: [85, 85, 85],
-                                backgroundColor: ['rgba(129,140,248,0.25)', 'rgba(45,212,191,0.25)', 'rgba(251,191,36,0.25)'],
-                                borderRadius: 10,
-                                borderWidth: 2,
-                                borderColor: 'rgba(255,255,255,0.08)'
-                            }
+                            { label: 'Your Score', data: [att, sub, intern], backgroundColor: ['rgba(99,102,241,0.7)', 'rgba(245,158,11,0.7)', 'rgba(34,197,94,0.7)'], hoverBackgroundColor: ['rgba(99,102,241,1)', 'rgba(245,158,11,1)', 'rgba(34,197,94,1)'], borderRadius: 4 },
+                            { label: 'Target', data: [85, 85, 85], backgroundColor: 'rgba(239,68,68,0.2)', hoverBackgroundColor: 'rgba(239,68,68,0.4)', borderRadius: 4 }
                         ]
                     },
                     options: {
                         indexAxis: 'y',
+                        responsive: true, maintainAspectRatio: false,
+                        scales: {
+                            x: { min: 0, max: 110, grid: { color: 'rgba(0,0,0,0.06)' }, ticks: { color: '#4A3320' } },
+                            y: { grid: { display: false }, ticks: { color: '#4A3320' } }
+                        },
                         plugins: {
-                            legend: { position: 'bottom' },
-                            datalabels: {
-                                anchor: 'end',
-                                align: 'right',
-                                color: '#fff',
-                                font: { weight: '900', size: 12, family: 'var(--font-mono)' },
-                                formatter: (v) => v + '%'
-                            },
+                            datalabels: { display: false },
+                            legend: { position: 'top', labels: { usePointStyle: true, padding: 15, color: '#4A3320' } },
                             tooltip: {
-                                callbacks: {
-                                    label: (ctx) => {
-                                        return ctx.dataset.label + ': ' + ctx.parsed.x + '%';
-                                    }
-                                }
+                                enabled: true,
+                                backgroundColor: 'rgba(44, 30, 22, 0.95)',
+                                titleColor: '#FCF5E5',
+                                bodyColor: '#FCF5E5',
+                                borderColor: '#8B4513',
+                                borderWidth: 1,
+                                cornerRadius: 10,
+                                padding: 14,
+                                titleFont: { size: 13, weight: 'bold', family: "'Plus Jakarta Sans', sans-serif" },
+                                bodyFont: { size: 12, family: "'Plus Jakarta Sans', sans-serif" },
+                                displayColors: true,
+                                boxPadding: 6,
+                                caretSize: 8,
+                                caretPadding: 10,
+                                usePointStyle: true,
+                                animation: { duration: 200, easing: 'easeOutCubic' }
                             }
                         },
-                        scales: {
-                            x: { min: 0, max: 110, grid: { color: 'rgba(139,69,19,0.05)' }, ticks: { color: '#4A3320', font: { weight: '700' } } },
-                            y: { grid: { display: false }, ticks: { color: '#4A3320' } }
-                        }
+                        interaction: { mode: 'index', intersect: false },
+                        hover: { mode: 'index', intersect: false, animationDuration: 300 }
                     }
                 });
             }
         });
 
-        const allMessages = {{ messages | tojson | safe }};
+        let allMessages = {{ messages | tojson | safe }};
         const currentStudentId = "{{ request.cookies.get('user_id', '') }}";
         let activeChatSubject = "GLOBAL";
+        let doubtPoller = null;
+
+        async function fetchMessages() {
+            try {
+                const res = await fetch('/api/messages');
+                if (res.ok) {
+                    allMessages = await res.json();
+                    renderChatMessages();
+                }
+            } catch(e) {}
+        }
 
         function openDoubtSessions() {
             const overlay = document.getElementById('doubtSessionsOverlay');
             overlay.style.display = 'flex';
             setTimeout(() => overlay.style.opacity = '1', 10);
             renderChatMessages();
+            if(doubtPoller) clearInterval(doubtPoller);
+            doubtPoller = setInterval(fetchMessages, 10000);
         }
 
         function closeDoubtSessions() {
             const overlay = document.getElementById('doubtSessionsOverlay');
             overlay.style.opacity = '0';
             setTimeout(() => overlay.style.display = 'none', 300);
+            if(doubtPoller) clearInterval(doubtPoller);
         }
 
         function selectChatSubject(subject, btnElement) {
             activeChatSubject = subject;
             document.getElementById('hiddenSubjectCode').value = subject;
-            document.getElementById('chatSubjectName').innerText = subject;
+            document.getElementById('chatSubjectName').innerText = subject === '__ADMIN__' ? '📢 Admin Broadcasts' : subject;
 
             document.querySelectorAll('.subject-chat-btn').forEach(btn => {
                 btn.classList.remove('active');
                 btn.style.background = 'transparent';
                 btn.style.border = '1px solid transparent';
-                btn.style.color = 'var(--text-secondary)';
+                btn.style.color = '#000000';
             });
-            btnElement.classList.add('active');
-            btnElement.style.background = 'var(--bg-primary)';
-            btnElement.style.border = '1px solid var(--accent)';
-            btnElement.style.color = 'var(--text-primary)';
+            if (btnElement) {
+                btnElement.classList.add('active');
+                btnElement.style.background = 'var(--bg-primary)';
+                btnElement.style.border = '1px solid var(--accent)';
+            }
             renderChatMessages();
         }
 
         function renderChatMessages() {
             const area = document.getElementById('chatMessagesArea');
-            area.innerHTML = `
-                <div style="text-align: center; color: var(--text-muted); font-size: 0.8rem; margin-top: 20px; flex-shrink: 0;">
-                    Messages are end-to-end monitored by Academic Faculty.
-                </div>
-            `;
+            area.innerHTML = '';
 
-            const filtered = allMessages.filter(m => m.subject_code === activeChatSubject || (activeChatSubject === 'GLOBAL' && m.subject_code === null)).reverse();
+            const filtered = allMessages.filter(m => {
+                if (activeChatSubject === '__ADMIN__') return ['BROADCAST_ALL', 'BROADCAST_STUDENTS', 'DIRECT_ADMIN'].includes(m.subject_code);
+                return m.subject_code === activeChatSubject;
+            });
 
             if (filtered.length === 0) {
-                area.innerHTML += `<div style="text-align:center; color: var(--text-muted); font-size: 0.9rem; margin: auto;">No doubts asked yet.</div>`;
+                area.innerHTML = `<div style="text-align:center; color:#8B4513; font-size:0.9rem; margin:auto; padding:30px 0;">No messages yet. Start the conversation!</div>`;
                 return;
             }
 
             filtered.forEach(m => {
                 const isMe = String(m.sender_id) === String(currentStudentId);
+                const isAdminMsg = m.sender_id === 'admin' || ['BROADCAST_ALL', 'BROADCAST_STUDENTS', 'BROADCAST_FACULTY'].includes(m.subject_code);
+
+                const bg = isMe ? 'linear-gradient(135deg, #1e3a8a, #2563eb)' : '#ffffff';
+                const textColor = isMe ? '#fff' : '#000000';
                 const align = isMe ? 'flex-end' : 'flex-start';
-                const bg = isMe ? 'var(--accent)' : 'var(--bg-secondary)';
-                const tagHtml = m.tag ? `<div style="font-size: 0.6rem; color: rgba(255,255,255,0.7); margin-bottom: 3px;">${m.tag}</div>` : '';
+                const borderRadius = isMe ? '18px 18px 4px 18px' : '18px 18px 18px 4px';
+                const shadow = isMe ? '0 2px 8px rgba(37, 99, 235, 0.3)' : '0 2px 8px rgba(0,0,0,0.08)';
+                const border = isMe ? 'none' : '1px solid rgba(0,0,0,0.1)';
+
+                let senderNameHtml = '';
+                if (!isMe) {
+                    senderNameHtml = isAdminMsg
+                        ? '<div style="font-size:0.65rem;color:#ef4444;font-weight:bold;margin-bottom:2px;">🔒 Admin Broadcast</div>'
+                        : `<div style="font-size:0.65rem;color:#6366f1;margin-bottom:2px;font-weight:bold;">${m.sender_name || 'Faculty'}</div>`;
+                }
+
+                const tagHtml = m.tag ? `<div style="margin-top:4px;"><span style="background:rgba(128,128,128,0.2);font-size:0.6rem;padding:2px 6px;border-radius:10px;">#${m.tag}</span></div>` : '';
+                const timeStr = m.sent_at ? new Date(m.sent_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
 
                 area.innerHTML += `
-                    <div style="align-self: ${align}; max-width: 80%; flex-shrink: 0;">
-                        ${!isMe ? '<div style="font-size: 0.65rem; color: var(--cyan); margin-bottom: 2px;">Faculty User</div>' : ''}
-                        <div style="background: ${bg}; color: ${isMe ? '#fff' : 'var(--text-primary)'}; padding: 10px 14px; border-radius: 12px; font-size: 0.85rem; line-height: 1.4; box-shadow: 0 4px 10px rgba(0,0,0,0.2);">
-                            ${tagHtml}
+                    <div style="align-self:${align};max-width:80%;flex-shrink:0;">
+                        ${senderNameHtml}
+                        <div style="background:${bg};color:${textColor};padding:10px 14px;border-radius:${borderRadius};font-size:0.85rem;line-height:1.4;box-shadow:${shadow};border:${border};">
                             ${m.message}
-                            <div style="font-size: 0.6rem; text-align: right; margin-top: 5px; opacity: 0.6;">
-                                ${new Date(m.sent_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} 
-                                ${isMe ? '<span style="color:#4ade80">✓✓</span>' : ''}
+                            ${tagHtml}
+                            <div style="font-size:0.6rem;text-align:right;margin-top:5px;opacity:0.7;">
+                                ${timeStr} ${isMe ? '<span style="color:#4ade80">✓✓</span>' : ''}
                             </div>
                         </div>
                     </div>
                 `;
             });
 
-            setTimeout(() => { area.scrollTop = area.scrollHeight; }, 50);
+            const isScrolledToBottom = area.scrollHeight - area.clientHeight <= area.scrollTop + 50;
+            if (isScrolledToBottom || area.childElementCount <= 2) {
+                setTimeout(() => { area.scrollTop = area.scrollHeight; }, 50);
+            }
         }
 
         async function summarizeChat() {
             const formData = new FormData();
             formData.append('subject_code', activeChatSubject);
-
             alert("Processing Summary...");
             const res = await fetch('/api/messages/summarize', { method: 'POST', body: formData });
             const data = await res.json();
@@ -643,13 +629,12 @@
         document.getElementById('doubtForm').onsubmit = async (e) => {
             e.preventDefault();
             const formData = new FormData(e.target);
-
             const msgInput = document.getElementById('chatInputMessage');
             const msg = msgInput.value;
             const tag = e.target.tag.value;
             msgInput.value = '';
 
-            allMessages.unshift({
+            allMessages.push({
                 sender_id: currentStudentId,
                 subject_code: activeChatSubject,
                 message: msg,
@@ -658,23 +643,32 @@
             });
             renderChatMessages();
 
-            const res = await fetch('/api/messages/send', { method: 'POST', body: formData });
-            if (!res.ok) location.reload();
+            const btn = e.target.querySelector('button[type="submit"]');
+            btn.disabled = true; btn.innerText = '->';
+            try {
+                await fetch('/api/messages/send', { method: 'POST', body: formData });
+                fetchMessages();
+            } catch(e) {
+                alert("Failed to send message.");
+            } finally {
+                btn.disabled = false; btn.innerText = 'Send >>';
+            }
         };
 
         const menuToggle = document.getElementById('menuToggle');
         const subjectDropdown = document.getElementById('subjectDropdown');
-
-        if (menuToggle) {
-            menuToggle.addEventListener('click', (e) => {
-                e.stopPropagation();
+        if (menuToggle && subjectDropdown) {
+            menuToggle.addEventListener('click', () => {
                 subjectDropdown.classList.toggle('active');
+                menuToggle.classList.toggle('open');
+            });
+            document.addEventListener('click', (e) => {
+                if (!menuToggle.contains(e.target) && !subjectDropdown.contains(e.target)) {
+                    subjectDropdown.classList.remove('active');
+                    menuToggle.classList.remove('open');
+                }
             });
         }
-        document.addEventListener('click', () => {
-            if (subjectDropdown) subjectDropdown.classList.remove('active');
-        });
     </script>
 </body>
-
 </html>

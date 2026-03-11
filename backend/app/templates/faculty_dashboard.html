@@ -23,7 +23,7 @@
             </div>
             <div class="user-info">
                 <h1 style="display: flex; align-items: center; gap: 10px;">AGMIS <span
-                        style="font-weight: 400; color: var(--text-muted); font-size: 1.1rem;">|</span> {{
+                        style="font-weight: 400; color: #000000; font-size: 1.1rem;">|</span> {{
                     faculty.subject_name }} Center</h1>
                 <span class="batch-tag">Terminal#2-510 | Faculty Access | {{ faculty.subject_code }}</span>
             </div>
@@ -33,25 +33,26 @@
                 style="display: flex; align-items: center; gap: 10px; background: rgba(255,255,255,0.05); padding: 6px 16px; border-radius: var(--radius-md); border: 1px solid var(--glass-border);">
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <span
-                        style="font-family: var(--font-mono); font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted);">Year</span>
+                        style="font-family: var(--font-mono); font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: #000000;">Year</span>
                     <select name="year"
-                        style="border: none; background: transparent; font-weight: 700; color: var(--text-primary); cursor: pointer; outline: none; font-size: 0.8rem;">
+                        style="border: none; background: transparent; font-weight: 700; color: #000000; cursor: pointer; outline: none; font-size: 0.8rem;">
                         <option value="" style="background: var(--bg-secondary);">All</option>
                         <option value="1" style="background: var(--bg-secondary);">Year 1</option>
                         <option value="2" style="background: var(--bg-secondary);">Year 2</option>
                         <option value="3" style="background: var(--bg-secondary);">Year 3</option>
+                        <option value="4" style="background: var(--bg-secondary);">Year 4</option>
                     </select>
                 </div>
                 <div style="width: 1px; height: 16px; background: var(--glass-border);"></div>
                 <div style="display: flex; align-items: center; gap: 8px;">
                     <span
-                        style="font-family: var(--font-mono); font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: var(--text-muted);">Batch</span>
+                        style="font-family: var(--font-mono); font-size: 0.6rem; font-weight: 800; text-transform: uppercase; color: #000000;">Batch</span>
                     <select name="batch"
-                        style="border: none; background: transparent; font-weight: 700; color: var(--text-primary); cursor: pointer; outline: none; font-size: 0.8rem;">
-                        <option value="" style="background: var(--bg-secondary);">All</option>
+                        style="border: none; background: transparent; font-weight: 700; color: #000000; cursor: pointer; outline: none; font-size: 0.8rem;">
                         <option value="A" style="background: var(--bg-secondary);">A</option>
                         <option value="B" style="background: var(--bg-secondary);">B</option>
                         <option value="C" style="background: var(--bg-secondary);">C</option>
+                        <option value="D" style="background: var(--bg-secondary);">D</option>
                     </select>
                 </div>
                 <button type="submit" class="btn-primary"
@@ -59,108 +60,79 @@
             </form>
             </form>
             <a href="/faculty/download-template/{{ faculty.subject_code }}" class="btn-primary"
-                style="padding: 10px 20px; font-size: 0.8rem; border-radius: 10px; background: rgba(0,0,0,0.05); color: var(--text-primary); text-decoration: none; border: 1px solid var(--glass-border);">Download
+                style="padding: 10px 20px; font-size: 0.8rem; border-radius: 10px; background: rgba(0,0,0,0.05); color: #000000; text-decoration: none; border: 1px solid var(--glass-border);">Download
                 Template</a>
             <input type="file" id="csvUpload" accept=".csv" style="display:none" onchange="handleUpload(this)">
             <button onclick="openDoubtSessions()" class="btn-primary"
-                style="padding: 10px 20px; font-size: 0.8rem; border-radius: 10px; background: rgba(139, 69, 19, 0.15); border: 1px solid var(--accent); color: var(--text-primary);">Doubt
+                style="padding: 10px 20px; font-size: 0.8rem; border-radius: 10px; background: rgba(139, 69, 19, 0.15); border: 1px solid var(--accent); color: #000000;">Doubt
                 Sessions 💬</button>
             <button type="button" class="btn-primary"
-                style="padding: 10px 20px; font-size: 0.8rem; border-radius: 10px; background: rgba(139, 69, 19, 0.2); border: 1px solid var(--accent); color: var(--text-primary);"
+                style="padding: 10px 20px; font-size: 0.8rem; border-radius: 10px; background: rgba(139, 69, 19, 0.2); border: 1px solid var(--accent); color: #000000;"
                 onclick="openStudentModal()">+ Add Student</button>
             <button type="button" class="btn-primary"
                 style="padding: 10px 20px; font-size: 0.8rem; border-radius: 10px;"
                 onclick="document.getElementById('csvUpload').click()">Upload CSV</button>
             <a href="/logout" class="btn-primary"
-                style="padding: 10px 20px; font-size: 0.8rem; border-radius: 10px; background: var(--bg-primary); color: var(--text-secondary);">Logout</a>
+                style="padding: 10px 20px; font-size: 0.8rem; border-radius: 10px; background: var(--bg-primary); color: #000000;">Logout</a>
         </div>
     </div>
 
-    <div class="container">
-        <div class="dashboard-grid">
-            <!-- Main Content Column -->
-            <div class="main-column">
-                <!-- Grouped Stats Row -->
-                <div class="stats-grid"
-                    style="display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; margin-bottom: 30px;">
-                    <div class="card stat-card-mini" style="padding: 20px; border-left: 3px solid var(--cyan);">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
-                            <div
-                                style="width: 32px; height: 32px; background: rgba(34, 211, 238, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--cyan);">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path>
-                                    <circle cx="9" cy="7" r="4"></circle>
-                                    <path d="M23 21v-2a4 4 0 0 0-3-3.87"></path>
-                                    <path d="M16 3.13a4 4 0 0 1 0 7.75"></path>
-                                </svg>
-                            </div>
-                            <h3 style="margin: 0; font-size: 0.65rem;">Batch Size</h3>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-                            <p class="stat-value"
-                                style="font-size: 1.8rem; line-height: 1; color: var(--text-primary);">{{ stats.total }}
-                            </p>
-                            <span
-                                style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase;">Total
-                                Students</span>
-                        </div>
-                    </div>
-                    <div class="card stat-card-mini" style="padding: 20px; border-left: 3px solid var(--accent);">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
-                            <div
-                                style="width: 32px; height: 32px; background: rgba(99, 102, 241, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--accent);">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <polyline points="22 12 18 12 15 21 9 3 6 12 2 12"></polyline>
-                                </svg>
-                            </div>
-                            <h3 style="margin: 0; font-size: 0.65rem;">Avg Performance</h3>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-                            <p class="stat-value" style="font-size: 1.8rem; line-height: 1; color: var(--accent);">{{
-                                stats.avg_pred }}%</p>
-                            <span
-                                style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase;">Batch
-                                Mean</span>
-                        </div>
-                    </div>
-                    <div class="card stat-card-mini" style="padding: 20px; border-left: 3px solid var(--danger);">
-                        <div style="display: flex; align-items: center; gap: 12px; margin-bottom: 10px;">
-                            <div
-                                style="width: 32px; height: 32px; background: rgba(248, 113, 113, 0.1); border-radius: 8px; display: flex; align-items: center; justify-content: center; color: var(--danger);">
-                                <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor"
-                                    stroke-width="2" stroke-linecap="round" stroke-linejoin="round">
-                                    <path
-                                        d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z">
-                                    </path>
-                                    <line x1="12" y1="9" x2="12" y2="13"></line>
-                                    <line x1="12" y1="17" x2="12.01" y2="17"></line>
-                                </svg>
-                            </div>
-                            <h3 style="margin: 0; font-size: 0.65rem;">Risk Alerts</h3>
-                        </div>
-                        <div style="display: flex; justify-content: space-between; align-items: flex-end;">
-                            <p class="stat-value" style="font-size: 1.8rem; line-height: 1; color: var(--danger);">{{
-                                stats.at_risk_count }}</p>
-                            <span
-                                style="font-family: var(--font-mono); font-size: 0.6rem; color: var(--text-muted); text-transform: uppercase;">Critically
-                                Low</span>
-                        </div>
-                    </div>
-                </div>
+    <div class="container" style="max-width: 1400px; margin: 0 auto; padding: 20px 24px;">
 
-                <div class="charts-row"
-                    style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px; margin-bottom: 30px;">
-                    <div class="card chart-card">
-                        <h3>Performance Matrix</h3>
-                        <div class="chart-img-wrap" style="height: 300px;">
+        <!-- TOP STAT CARDS -->
+        <div style="display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 16px; margin-bottom: 24px;">
+
+            <div class="card" style="padding: 20px; border-radius: 12px; border-left: 4px solid #0891b2; transition: transform 0.2s; cursor: default;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 0.7rem; font-weight: 700; color: #8B4513; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">👥 Batch Size</div>
+                <div style="font-size: 1.8rem; font-weight: 800; color: #2C1E16; line-height: 1;">{{ stats.total }}</div>
+                <div style="font-size: 0.8rem; color: #6B4226; margin-top: 6px;">Total students</div>
+            </div>
+
+            <div class="card" style="padding: 20px; border-radius: 12px; border-left: 4px solid #6366f1; transition: transform 0.2s; cursor: default;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 0.7rem; font-weight: 700; color: #8B4513; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">📈 Avg Performance</div>
+                <div style="font-size: 1.8rem; font-weight: 800; color: #6366f1; line-height: 1;">{{ stats.avg_pred }}%</div>
+                <div style="font-size: 0.8rem; color: #6B4226; margin-top: 6px;">Batch mean score</div>
+            </div>
+
+            <div class="card" style="padding: 20px; border-radius: 12px; border-left: 4px solid #ef4444; transition: transform 0.2s; cursor: default;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 0.7rem; font-weight: 700; color: #8B4513; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">⚠️ Risk Alerts</div>
+                <div style="font-size: 1.8rem; font-weight: 800; color: #ef4444; line-height: 1;">{{ stats.at_risk_count }}</div>
+                <div style="font-size: 0.8rem; color: #6B4226; margin-top: 6px;">Critically low</div>
+            </div>
+
+            <div class="card" style="padding: 20px; border-radius: 12px; border-left: 4px solid #22c55e; transition: transform 0.2s; cursor: default;" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 0.7rem; font-weight: 700; color: #8B4513; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">✅ Excellent</div>
+                <div style="font-size: 1.8rem; font-weight: 800; color: #22c55e; line-height: 1;">{{ stats.distribution.excellent or 0 }}</div>
+                <div style="font-size: 0.8rem; color: #6B4226; margin-top: 6px;">Top performers</div>
+            </div>
+
+            <div class="card" style="padding: 20px; border-radius: 12px; border-left: 4px solid #d97706; transition: transform 0.2s; cursor: pointer;" onclick="openDoubtSessions()" onmouseover="this.style.transform='translateY(-3px)'" onmouseout="this.style.transform='translateY(0)'">
+                <div style="font-size: 0.7rem; font-weight: 700; color: #8B4513; letter-spacing: 0.1em; text-transform: uppercase; margin-bottom: 8px;">💬 Doubt Sessions</div>
+                <div style="font-size: 1.8rem; font-weight: 800; color: #2C1E16; line-height: 1;">Open</div>
+                <div style="font-size: 0.8rem; color: #6B4226; margin-top: 6px;">Chat with students</div>
+            </div>
+
+        </div>
+
+        <!-- Main 2-col layout -->
+        <div style="display: grid; grid-template-columns: 1fr 360px; gap: 20px; align-items: start;">
+
+            <!-- LEFT column -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+
+                <!-- Charts side by side -->
+                <div style="display: grid; grid-template-columns: 1.5fr 1fr; gap: 20px;">
+                    <div class="card" style="padding: 20px; border-radius: 12px; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(139,69,19,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.06)';">
+                        <h3 style="margin: 0 0 4px 0; font-size: 0.95rem; font-weight: 700; color: #2C1E16;">📊 Performance Matrix</h3>
+                        <p style="margin: 0 0 14px 0; font-size: 0.72rem; color: #8B4513;">Click a bar to filter the student list below</p>
+                        <div style="position: relative; height: 260px; width: 100%;">
                             <canvas id="performanceBarChart"></canvas>
                         </div>
                     </div>
-                    <div class="card chart-card">
-                        <h3>Distribution</h3>
-                        <div class="chart-img-wrap" style="height: 300px;">
+                    <div class="card" style="padding: 20px; border-radius: 12px; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(139,69,19,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.06)';">
+                        <h3 style="margin: 0 0 4px 0; font-size: 0.95rem; font-weight: 700; color: #2C1E16;">🥧 Distribution</h3>
+                        <p style="margin: 0 0 14px 0; font-size: 0.72rem; color: #8B4513;">Category breakdown</p>
+                        <div style="position: relative; height: 260px; width: 100%;">
                             <canvas id="distributionPieChart"></canvas>
                         </div>
                     </div>
@@ -190,8 +162,7 @@
                                 <tr>
                                     <td>
                                         <div style="font-weight: 800;">{{ s.name }}</div>
-                                        <div
-                                            style="font-size: 0.7rem; color: var(--text-muted); font-family: var(--font-mono);">
+                                        <div style="font-size: 0.7rem; color: #000000; font-family: var(--font-mono);">
                                             ID: {{ s.student_id }}</div>
                                     </td>
                                     <td><span class="badge badge-{{ s.current_cat | lower | replace(' ', '-') }}">{{
@@ -207,8 +178,8 @@
                                 </tr>
                                 {% else %}
                                 <tr>
-                                    <td colspan="5"
-                                        style="text-align: center; padding: 40px; color: var(--text-muted);">SECURE: No
+                                    <td colspan="5" style="text-align: center; padding: 40px; color: #000000;">SECURE:
+                                        No
                                         students currently in critical risk zones.</td>
                                 </tr>
                                 {% endfor %}
@@ -218,22 +189,24 @@
                 </div>
             </div>
 
-            <!-- Sidebar Intelligence Column -->
-            <div class="side-column">
-                <div class="card">
-                    <h3>Risk Overview Index</h3>
-                    <div class="chart-img-wrap" style="height: 300px;">
+            </div><!-- /LEFT column -->
+
+            <!-- RIGHT sidebar column -->
+            <div style="display: flex; flex-direction: column; gap: 20px;">
+                <div class="card" style="padding: 20px; border-radius: 12px; transition: transform 0.2s, box-shadow 0.2s;" onmouseover="this.style.transform='translateY(-4px)'; this.style.boxShadow='0 8px 24px rgba(139,69,19,0.15)';" onmouseout="this.style.transform='translateY(0)'; this.style.boxShadow='0 2px 8px rgba(0,0,0,0.06)';">
+                    <h3 style="margin: 0 0 4px 0; font-size: 0.95rem; font-weight: 700; color: #2C1E16;">🎯 Risk Overview Index</h3>
+                    <p style="margin: 0 0 14px 0; font-size: 0.72rem; color: #8B4513;">At-risk vs on-track students</p>
+                    <div style="position: relative; height: 240px; width: 100%;">
                         <canvas id="riskPieChart"></canvas>
                     </div>
-                    <div
-                        style="margin-top: 20px; font-family: var(--font-mono); font-size: 0.75rem; color: var(--text-secondary);">
-                        <div style="display: flex; justify-content: space-between; margin-bottom: 8px;">
-                            <span>System Status:</span>
-                            <span style="color: var(--success);">OPERATIONAL</span>
+                    <div style="margin-top: 16px; font-size: 0.78rem; color: #4A3320; display: flex; flex-direction: column; gap: 8px;">
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: rgba(34,197,94,0.07); border-radius: 6px;">
+                            <span>System Status</span>
+                            <span style="font-weight: 700; color: #22c55e;">OPERATIONAL</span>
                         </div>
-                        <div style="display: flex; justify-content: space-between;">
-                            <span>Data Integrity:</span>
-                            <span style="color: var(--cyan);">100%</span>
+                        <div style="display: flex; justify-content: space-between; align-items: center; padding: 6px 10px; background: rgba(99,102,241,0.07); border-radius: 6px;">
+                            <span>Data Integrity</span>
+                            <span style="font-weight: 700; color: #6366f1;">100%</span>
                         </div>
                     </div>
                 </div>
@@ -286,7 +259,7 @@
                         {% for n in notifications %}
                         <div
                             style="padding: 10px; border-bottom: 1px solid var(--glass-border); background: rgba(255,255,255,0.02); margin-bottom: 5px; border-radius: 4px;">
-                            <div style="font-size: 0.6rem; color: var(--text-muted); margin-bottom: 4px;">{{
+                            <div style="font-size: 0.6rem; color: #000000; margin-bottom: 4px;">{{
                                 n.created_at }}</div>
                             <div style="font-size: 0.8rem;">{{ n.message }}</div>
                         </div>
@@ -374,7 +347,7 @@
                             class="input-field" style="min-height: 150px; resize: none;" required></textarea>
                         <input type="hidden" name="subject_code" value="{{ faculty.subject_code }}">
                         <select name="n_type" class="input-field"
-                            style="background: var(--bg-primary); border: 1px solid var(--glass-border); color: #fff; padding: 12px; margin-top: 10px;">
+                            style="background: var(--bg-primary); border: 1px solid var(--glass-border); color: #000000; padding: 12px; margin-top: 10px;">
                             <option value="announcement">Standard Announcement</option>
                             <option value="alert">Critical Alert (Red)</option>
                         </select>
@@ -382,7 +355,7 @@
                         <div style="display: flex; gap: 15px; margin-top: 20px;">
                             <button type="submit" class="btn-login" style="flex: 2; margin: 0;">Broadcast</button>
                             <button type="button" class="btn-primary"
-                                style="flex: 1; background: var(--bg-primary); color: var(--text-secondary); border: 1px solid var(--glass-border);"
+                                style="flex: 1; background: var(--bg-primary); color: #000000; border: 1px solid var(--glass-border);"
                                 onclick="closeAnnouncementModal()">Cancel</button>
                         </div>
                     </form>
@@ -396,7 +369,7 @@
                         <input type="text" name="title" placeholder="Title (e.g. Unit 1 Notes)" class="input-field"
                             required>
                         <select name="type" class="input-field"
-                            style="background: var(--bg-primary); border: 1px solid var(--glass-border); color: #fff; padding: 12px;">
+                            style="background: var(--bg-primary); border: 1px solid var(--glass-border); color: #000000; padding: 12px;">
                             <option value="pdf">PDF Document</option>
                             <option value="docx">Word Document</option>
                             <option value="pptx">PowerPoint</option>
@@ -417,7 +390,7 @@
                         <div style="display: flex; gap: 15px; margin-top: 20px;">
                             <button type="submit" class="btn-login" style="flex: 2; margin: 0;">Add Material</button>
                             <button type="button" class="btn-primary"
-                                style="flex: 1; background: var(--bg-primary); color: var(--text-secondary); border: 1px solid var(--glass-border);"
+                                style="flex: 1; background: var(--bg-primary); color: #000000; border: 1px solid var(--glass-border);"
                                 onclick="closeMaterialModal()">Cancel</button>
                         </div>
                     </form>
@@ -435,7 +408,7 @@
                             style="min-height: 100px; resize: none;"></textarea>
                         <input type="date" name="event_date" class="input-field" required>
                         <select name="event_type" class="input-field"
-                            style="background: var(--bg-primary); border: 1px solid var(--glass-border); color: #fff; padding: 12px;">
+                            style="background: var(--bg-primary); border: 1px solid var(--glass-border); color: #000000; padding: 12px;">
                             <option value="deadline">Assignment Deadline</option>
                             <option value="exam">Examination</option>
                             <option value="event">Academic Event</option>
@@ -445,7 +418,7 @@
                         <div style="display: flex; gap: 15px; margin-top: 20px;">
                             <button type="submit" class="btn-login" style="flex: 2; margin: 0;">Add Event</button>
                             <button type="button" class="btn-primary"
-                                style="flex: 1; background: var(--bg-primary); color: var(--text-secondary); border: 1px solid var(--glass-border);"
+                                style="flex: 1; background: var(--bg-primary); color: #000000; border: 1px solid var(--glass-border);"
                                 onclick="closeEventModal()">Cancel</button>
                         </div>
                     </form>
@@ -462,8 +435,8 @@
                     <div
                         style="width: 250px; background: rgba(15,23,42,0.5); border-right: 1px solid var(--glass-border); display: flex; flex-direction: column;">
                         <div style="padding: 20px; border-bottom: 1px solid var(--glass-border);">
-                            <h3 style="margin: 0; color: #fff; font-size: 1rem;">Doubt Sessions</h3>
-                            <div style="font-size: 0.7rem; color: var(--text-muted); margin-top: 5px;">Student Threads
+                            <h3 style="margin: 0; color: #000000; font-size: 1rem;">Doubt Sessions</h3>
+                            <div style="font-size: 0.7rem; color: #000000; margin-top: 5px;">Student Threads
                             </div>
                         </div>
                         <div id="subjectListContainer"
@@ -478,17 +451,16 @@
                         <div
                             style="padding: 15px 20px; border-bottom: 1px solid var(--glass-border); display: flex; justify-content: space-between; align-items: center; background: rgba(139, 69, 19, 0.05);">
                             <div style="display: flex; align-items: center; gap: 10px;">
-                                <span id="chatSubjectName"
-                                    style="color: var(--text-primary); font-weight: 600;">GLOBAL</span>
+                                <span id="chatSubjectName" style="color: #000000; font-weight: 600;">GLOBAL</span>
                                 <span class="status-tag"
                                     style="background: rgba(139, 69, 19, 0.1); border: 1px solid var(--accent); font-size: 0.65rem;">Active
                                     Support</span>
                             </div>
                             <div style="display: flex; gap: 10px;">
                                 <button onclick="summarizeChat()" class="btn-primary"
-                                    style="padding: 6px 12px; font-size: 0.7rem; background: rgba(168, 85, 247, 0.2); border: 1px solid #a855f7; color: #fff;">Summarize</button>
+                                    style="padding: 6px 12px; font-size: 0.7rem; background: rgba(168, 85, 247, 0.2); border: 1px solid #a855f7; color: #000000;">Summarize</button>
                                 <button onclick="closeDoubtSessions()"
-                                    style="background: transparent; border: none; color: var(--text-muted); cursor: pointer; font-size: 1.2rem;">&times;</button>
+                                    style="background: transparent; border: none; color: #000000; cursor: pointer; font-size: 1.2rem;">&times;</button>
                             </div>
                         </div>
 
@@ -578,43 +550,63 @@
                     }
                 }
                 // Doubt Sessions Overlay Logic
-                const allMessages = {{ messages | tojson | safe }};
+                let allMessages = {{ messages | tojson | safe }};
                 const currentFacultyId = "{{ request.cookies.get('user_id', '') }}";
                 const facultySubjectCode = "{{ faculty.subject_code }}";
                 let activeChatThread = "GLOBAL";
+                let doubtPoller = null;
+
+                async function fetchMessages() {
+                    try {
+                        const res = await fetch('/api/messages');
+                        if (res.ok) {
+                            allMessages = await res.json();
+                            renderChatMessages();
+                        }
+                    } catch(e) {}
+                }
 
                 const uniqueThreads = new Map(); // other_id -> other_name
-                allMessages.forEach(m => {
-                    if (m.subject_code === 'GLOBAL') return;
-                    if (m.sender_id && String(m.sender_id) !== currentFacultyId) uniqueThreads.set(m.sender_id, m.sender_name);
-                    if (m.receiver_id && String(m.receiver_id) !== currentFacultyId) uniqueThreads.set(m.receiver_id, m.receiver_name);
-                });
+                function buildThreads() {
+                    uniqueThreads.clear();
+                    allMessages.forEach(m => {
+                        if (m.subject_code === 'GLOBAL') return;
+                        if (m.sender_id && String(m.sender_id) !== currentFacultyId) uniqueThreads.set(m.sender_id, m.sender_name);
+                        if (m.receiver_id && String(m.receiver_id) !== currentFacultyId) uniqueThreads.set(m.receiver_id, m.receiver_name);
+                    });
+                }
+                buildThreads();
 
                 function openDoubtSessions() {
                     const overlay = document.getElementById('doubtSessionsOverlay');
                     overlay.style.display = 'flex';
                     setTimeout(() => overlay.style.opacity = '1', 10);
+                    buildThreads();
                     populateSidebar();
                     selectChatThread('GLOBAL', 'GLOBAL', document.querySelector('.subject-chat-btn') || null);
+                    
+                    if(doubtPoller) clearInterval(doubtPoller);
+                    doubtPoller = setInterval(fetchMessages, 10000);
                 }
 
                 function closeDoubtSessions() {
                     const overlay = document.getElementById('doubtSessionsOverlay');
                     overlay.style.opacity = '0';
                     setTimeout(() => overlay.style.display = 'none', 300);
+                    if(doubtPoller) clearInterval(doubtPoller);
                 }
 
                 function populateSidebar() {
                     const container = document.getElementById('subjectListContainer');
                     let html = `
-                        <div class="subject-chat-btn active" onclick="selectChatThread('GLOBAL', 'GLOBAL', this)" style="padding: 10px 15px; border-radius: 8px; cursor: pointer; background: var(--bg-primary); border: 1px solid var(--accent); color: var(--text-primary); font-size: 0.85rem; transition: 0.2s; margin-bottom: 5px;">
+                        <div class="subject-chat-btn active" onclick="selectChatThread('GLOBAL', 'GLOBAL', this)" style="padding: 10px 15px; border-radius: 8px; cursor: pointer; background: var(--bg-primary); border: 1px solid var(--accent); color: #000000; font-size: 0.85rem; transition: 0.2s; margin-bottom: 5px;">
                             GLOBAL
                         </div>`;
                     uniqueThreads.forEach((name, id) => {
                         html += `
-                        <div class="subject-chat-btn" onclick="selectChatThread('${id}', '${name}', this)" style="padding: 10px 15px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; color: var(--text-secondary); font-size: 0.85rem; transition: 0.2s; margin-bottom: 5px;">
+                        <div class="subject-chat-btn" onclick="selectChatThread('${id}', '${name}', this)" style="padding: 10px 15px; border-radius: 8px; cursor: pointer; border: 1px solid transparent; color: #000000; font-size: 0.85rem; transition: 0.2s; margin-bottom: 5px;">
                             <div style="font-weight:600;">${name}</div>
-                            <div style="font-size: 0.65rem; color: var(--text-muted); font-family: var(--font-mono);">${id}</div>
+                            <div style="font-size: 0.65rem; color: #000000; font-family: var(--font-mono);">${id}</div>
                         </div>`;
                     });
                     container.innerHTML = html;
@@ -645,38 +637,59 @@
                     area.innerHTML = '';
 
                     const filtered = allMessages.filter(m => {
+                        if (activeChatThread === '__ADMIN__') {
+                            return ['BROADCAST_ALL', 'BROADCAST_FACULTY', 'DIRECT_ADMIN'].includes(m.subject_code);
+                        }
                         if (activeChatThread === 'GLOBAL') return m.subject_code === 'GLOBAL';
                         return String(m.sender_id) === String(activeChatThread) || String(m.receiver_id) === String(activeChatThread);
                     }).reverse();
 
                     if (filtered.length === 0) {
-                        area.innerHTML = `<div style="text-align:center; color: var(--text-muted); font-size: 0.9rem; margin: auto;">No doubts asked yet.</div>`;
+                        area.innerHTML = `<div style="text-align:center; color: #000000; font-size: 0.9rem; margin: auto;">No doubts asked yet.</div>`;
                         return;
                     }
 
                     filtered.forEach(m => {
                         const isMe = String(m.sender_id) === String(currentFacultyId);
+                        const isAdminMsg = m.sender_id === 'admin' || ['BROADCAST_ALL', 'BROADCAST_FACULTY', 'BROADCAST_STUDENTS'].includes(m.subject_code);
+
+                        const bg = isMe ? 'linear-gradient(135deg, #1e3a8a, #2563eb)' : '#ffffff';
+                        const textColor = isMe ? '#ffffff' : '#000000';
                         const align = isMe ? 'flex-end' : 'flex-start';
-                        const bg = isMe ? 'var(--accent)' : 'var(--bg-secondary)';
-                        const senderDisplay = !isMe ? `<div style="font-size: 0.65rem; color: var(--cyan); margin-bottom: 2px;">${m.sender_name}</div>` : '';
-                        const tagHtml = m.tag ? `<div style="font-size: 0.6rem; color: rgba(255,255,255,0.7); margin-bottom: 3px;">${m.tag}</div>` : '';
+                        const borderRadius = isMe ? '18px 18px 4px 18px' : '18px 18px 18px 4px';
+                        const shadow = isMe ? '0 2px 8px rgba(37, 99, 235, 0.3)' : '0 2px 8px rgba(0,0,0,0.08)';
+                        const borderColor = isMe ? 'none' : '1px solid rgba(0,0,0,0.1)';
+
+                        let senderNameHtml = '';
+                        if (!isMe) {
+                            if (isAdminMsg) {
+                                senderNameHtml = `<div style="font-size: 0.65rem; color: var(--danger); font-weight: bold; margin-bottom: 2px;">🔒 Admin Broadcast</div>`;
+                            } else {
+                                senderNameHtml = `<div style="font-size: 0.65rem; color: var(--cyan); margin-bottom: 2px; font-weight: bold;">${m.sender_name || m.sender_id}</div>`;
+                            }
+                        }
+
+                        const tagHtml = m.tag ? `<div style="margin-top: 4px;"><span style="background: rgba(128,128,128,0.2); font-size: 0.6rem; padding: 2px 6px; border-radius: 10px;">#${m.tag}</span></div>` : '';
+                        const timeStr = m.sent_at ? new Date(m.sent_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' }) : '';
 
                         area.innerHTML += `
                             <div style="align-self: ${align}; max-width: 80%; flex-shrink: 0;">
-                                ${senderDisplay}
-                                <div style="background: ${bg}; color: ${isMe ? '#fff' : 'var(--text-primary)'}; padding: 10px 14px; border-radius: 12px; font-size: 0.85rem; line-height: 1.4; box-shadow: 0 4px 10px rgba(0,0,0,0.1);">
-                                    ${tagHtml}
+                                ${senderNameHtml}
+                                <div style="background: ${bg}; color: ${textColor}; padding: 10px 14px; border-radius: ${borderRadius}; font-size: 0.85rem; line-height: 1.4; box-shadow: ${shadow}; border: ${borderColor};">
                                     ${m.message}
-                                    <div style="font-size: 0.6rem; text-align: right; margin-top: 5px; opacity: 0.6;">
-                                        ${new Date(m.sent_at).toLocaleTimeString([], { hour: '2-digit', minute: '2-digit' })} 
-                                        ${isMe ? '<span style="color:#228B22">✓✓</span>' : ''}
+                                    ${tagHtml}
+                                    <div style="font-size: 0.6rem; text-align: right; margin-top: 5px; opacity: 0.7;">
+                                        ${timeStr} ${isMe ? '<span style="color:#4ade80">✓✓</span>' : ''}
                                     </div>
                                 </div>
                             </div>
                         `;
                     });
 
-                    setTimeout(() => { area.scrollTop = area.scrollHeight; }, 50);
+                    const isScrolledToBottom = area.scrollHeight - area.clientHeight <= area.scrollTop + 50;
+                    if (isScrolledToBottom || area.childElementCount <= 2) {
+                        setTimeout(() => { area.scrollTop = area.scrollHeight; }, 50);
+                    }
                 }
 
                 async function summarizeChat() {
@@ -701,7 +714,7 @@
                     if (activeChatThread === 'GLOBAL') formData.set('subject_code', 'GLOBAL');
 
                     // Optimistic UI update
-                    allMessages.unshift({
+                    allMessages.push({
                         sender_id: currentFacultyId,
                         sender_name: "You",
                         subject_code: activeChatThread === 'GLOBAL' ? 'GLOBAL' : facultySubjectCode,
@@ -711,10 +724,21 @@
                     });
                     renderChatMessages();
 
-                    const res = await fetch('/api/messages/send', { method: 'POST', body: formData });
-                    if (!res.ok) location.reload();
+                    const btn = e.target.querySelector('button[type="submit"]');
+                    btn.disabled = true; btn.innerText = '->';
+
+                    try {
+                        await fetch('/api/messages/send', { method: 'POST', body: formData });
+                        fetchMessages(); // re-fetch to get up-to-date db state
+                    } catch(e) {
+                        alert("Network error sending message.");
+                    } finally {
+                        btn.disabled = false; btn.innerText = 'Send >>';
+                    }
                 };
-                document.addEventListener('DOMContentLoaded', function () {
+                (function initCharts() {
+                    // Try immediately, or retry after a delay
+                    function doInit() {
                     // Global Chart.js Defaults for Professional Cyber Aesthetics
                     Object.assign(Chart.defaults, {
                         font: {
@@ -824,13 +848,37 @@
                                         datalabels: {
                                             anchor: 'center',
                                             align: 'center',
-                                            color: '#fff',
+                                            color: '#000000',
                                             font: { weight: '900', size: 16, family: 'var(--font-mono)' },
                                             formatter: (v) => v > 0 ? v : '',
-                                            textShadowColor: 'rgba(0,0,0,0.5)',
+                                            textShadowColor: 'rgba(255, 255, 255, 0.8)',
                                             textShadowBlur: 4
+                                        },
+                                        tooltip: {
+                                            enabled: true,
+                                            backgroundColor: 'rgba(44, 30, 22, 0.95)',
+                                            titleColor: '#FCF5E5',
+                                            bodyColor: '#FCF5E5',
+                                            borderColor: '#8B4513',
+                                            borderWidth: 1,
+                                            cornerRadius: 10,
+                                            padding: 14,
+                                            titleFont: { size: 13, weight: 'bold' },
+                                            bodyFont: { size: 12 },
+                                            displayColors: true,
+                                            boxPadding: 6,
+                                            caretSize: 8,
+                                            usePointStyle: true,
+                                            animation: { duration: 200, easing: 'easeOutCubic' },
+                                            callbacks: {
+                                                label: function(ctx) {
+                                                    return ' ' + ctx.raw + ' student' + (ctx.raw !== 1 ? 's' : '');
+                                                }
+                                            }
                                         }
                                     },
+                                    interaction: { mode: 'index', intersect: false },
+                                    hover: { mode: 'index', intersect: false, animationDuration: 300 },
                                     scales: {
                                         y: {
                                             beginAtZero: true,
@@ -857,15 +905,35 @@
                                         backgroundColor: backgroundColors,
                                         borderColor: 'rgba(15, 23, 42, 1)',
                                         borderWidth: 2,
-                                        hoverOffset: 10,
+                                        hoverOffset: 18,
                                         borderRadius: 4
                                     }]
                                 },
                                 options: {
+                                    hover: { animationDuration: 300 },
                                     plugins: {
-                                        legend: { position: 'bottom', labels: { padding: 15, boxWidth: 10, color: '#94a3b8' } },
+                                        legend: { position: 'bottom', labels: { padding: 15, boxWidth: 10, color: '#94a3b8', usePointStyle: true } },
+                                        tooltip: {
+                                            enabled: true,
+                                            backgroundColor: 'rgba(44, 30, 22, 0.95)',
+                                            titleColor: '#FCF5E5',
+                                            bodyColor: '#FCF5E5',
+                                            borderColor: '#8B4513',
+                                            borderWidth: 1,
+                                            cornerRadius: 10,
+                                            padding: 14,
+                                            usePointStyle: true,
+                                            animation: { duration: 200, easing: 'easeOutCubic' },
+                                            callbacks: {
+                                                label: function(ctx) {
+                                                    const total = ctx.dataset.data.reduce((a,b) => a+b, 0);
+                                                    const pct = total > 0 ? Math.round(ctx.raw * 100 / total) : 0;
+                                                    return ' ' + ctx.label + ': ' + ctx.raw + ' (' + pct + '%)';
+                                                }
+                                            }
+                                        },
                                         datalabels: {
-                                            color: '#fff',
+                                            color: '#000000',
                                             font: { weight: '800', size: 11, family: 'var(--font-mono)' },
                                             formatter: (v, ctx) => {
                                                 if (v === 0) return '';
@@ -873,7 +941,9 @@
                                                 return `${v}\n(${perc}%)`;
                                             },
                                             textAlign: 'center',
-                                            backgroundColor: 'rgba(15, 23, 42, 0.6)',
+                                            backgroundColor: 'rgba(255, 255, 255, 0.6)',
+                                            borderColor: 'rgba(139, 69, 19, 0.3)',
+                                            borderWidth: 1,
                                             borderRadius: 4,
                                             padding: 4
                                         }
@@ -908,9 +978,26 @@
                                 options: {
                                     plugins: {
                                         legend: { display: false },
+                                        tooltip: {
+                                            enabled: true,
+                                            backgroundColor: 'rgba(44, 30, 22, 0.95)',
+                                            titleColor: '#FCF5E5',
+                                            bodyColor: '#FCF5E5',
+                                            borderColor: '#8B4513',
+                                            borderWidth: 1,
+                                            cornerRadius: 10,
+                                            padding: 14,
+                                            usePointStyle: true,
+                                            animation: { duration: 200, easing: 'easeOutCubic' },
+                                            callbacks: {
+                                                label: function(ctx) {
+                                                    return ' ' + ctx.label + ': ' + ctx.raw + ' students';
+                                                }
+                                            }
+                                        },
                                         datalabels: {
                                             display: true,
-                                            color: '#fff',
+                                            color: '#000000',
                                             font: { weight: '900', size: 12 },
                                             anchor: 'end',
                                             align: 'start',
@@ -920,7 +1007,8 @@
                                                 return label.toUpperCase();
                                             }
                                         }
-                                    }
+                                    },
+                                    hover: { animationDuration: 300 }
                                 },
                                 plugins: [{
                                     id: 'gaugeLabels',
@@ -949,7 +1037,14 @@
                             });
                         } catch (e) { }
                     }
-                });
+                } // end doInit()
+                // Run now if DOM ready, else wait
+                if (document.readyState === 'complete') {
+                    doInit();
+                } else {
+                    window.addEventListener('load', doInit);
+                }
+            })();
 
                 function filterStudentTable(category) {
                     const rows = document.querySelectorAll('.side-column .styled-table tbody tr');
@@ -1076,8 +1171,9 @@
                         console.error(err);
                         alert("Error adding event.");
                     }
-                } function deleteStudent(id) {
-                    if (confirm('Are you sure you want to completely remove this student?' + id)) {
+                }
+                function deleteStudent(id) {
+                    if (confirm('Are you sure you want to completely remove this student? ID: ' + id)) {
                         fetch('/faculty/student/' + id, { method: 'DELETE' })
                             .then(r => r.json())
                             .then(d => {
@@ -1109,85 +1205,85 @@
                 style="display:none; position:fixed; top:0; left:0; width:100%; height:100%; background:rgba(10,15,30,0.9); z-index:9999; align-items:center; justify-content:center;">
                 <div class="card" style="width:400px; padding:25px; border:1px solid var(--accent); position:relative;">
                     <button onclick="closeStudentModal()"
-                        style="position:absolute; top:15px; right:15px; background:none; border:none; color:#fff; cursor:pointer; font-size:1.2rem;">&times;</button>
+                        style="position:absolute; top:15px; right:15px; background:none; border:none; color:#000000; cursor:pointer; font-size:1.2rem;">&times;</button>
                     <h3 id="studentModalTitle" style="margin-top:0; color:var(--accent);">Manual Student Entry</h3>
                     <form id="studentForm" onsubmit="submitStudentForm(event)"
                         style="display:flex; flex-direction:column; gap:12px; font-size:0.85rem;">
 
                         <div>
                             <label for="m_student_id"
-                                style="color:var(--text-secondary); font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Student
+                                style="color: #000000; font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Student
                                 ID</label>
                             <input type="text" id="m_student_id" name="student_id" placeholder="Student ID" required
-                                style="width:100%; box-sizing:border-box; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:#fff;">
+                                style="width:100%; box-sizing:border-box; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:#000000;">
                         </div>
 
                         <div>
                             <label for="m_name"
-                                style="color:var(--text-secondary); font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Full
+                                style="color: #000000; font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Full
                                 Name</label>
                             <input type="text" id="m_name" name="name" placeholder="Full Name" required
-                                style="width:100%; box-sizing:border-box; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:#fff;">
+                                style="width:100%; box-sizing:border-box; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:#000000;">
                         </div>
 
                         <div>
                             <label for="m_week"
-                                style="color:var(--text-secondary); font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Current
+                                style="color: #000000; font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Current
                                 Week Number</label>
                             <input type="number" id="m_week" name="week" placeholder="Week Number (e.g. 1)" required
-                                style="width:100%; box-sizing:border-box; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:#fff;">
+                                style="width:100%; box-sizing:border-box; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:#000000;">
                         </div>
 
                         <div style="display:grid; grid-template-columns: 1fr 1fr; gap:10px;">
                             <div>
                                 <label for="m_lec_pct"
-                                    style="color:var(--text-secondary); font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Lecture
+                                    style="color: #000000; font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Lecture
                                     Attendance %</label>
                                 <input type="number" step="0.1" id="m_lec_pct" name="lec_pct" placeholder="Lec Pct"
-                                    style="width:100%; box-sizing:border-box; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:#fff;">
+                                    style="width:100%; box-sizing:border-box; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:#000000;">
                             </div>
                             <div>
                                 <label for="m_prac_pct"
-                                    style="color:var(--text-secondary); font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Practical
+                                    style="color: #000000; font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Practical
                                     Attendance %</label>
                                 <input type="number" step="0.1" id="m_prac_pct" name="prac_pct" placeholder="Prac Pct"
-                                    style="width:100%; box-sizing:border-box; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:#fff;">
+                                    style="width:100%; box-sizing:border-box; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:#000000;">
                             </div>
                         </div>
 
                         <div>
                             <label for="m_assign_pct"
-                                style="color:var(--text-secondary); font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Assignment
+                                style="color: #000000; font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Assignment
                                 Submission %</label>
                             <input type="number" step="0.1" id="m_assign_pct" name="assign_pct"
                                 placeholder="Assign Pct (0-100)"
-                                style="width:100%; box-sizing:border-box; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:#fff;">
+                                style="width:100%; box-sizing:border-box; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:#000000;">
                         </div>
 
                         <div style="display:grid; grid-template-columns: 1fr 1fr 1fr; gap:10px;">
                             <div>
                                 <label for="m_internal"
-                                    style="color:var(--text-secondary); font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Internal
+                                    style="color: #000000; font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Internal
                                     (Out of 20)</label>
                                 <input type="number" step="0.1" id="m_internal" name="internal"
                                     placeholder="Internal/20"
-                                    style="width:100%; box-sizing:border-box; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:#fff;">
+                                    style="width:100%; box-sizing:border-box; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:#000000;">
                             </div>
                             <div>
                                 <label for="m_external"
-                                    style="color:var(--text-secondary); font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">External
+                                    style="color: #000000; font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">External
                                     (Out of 75)</label>
                                 <input type="number" step="0.1" id="m_external" name="external"
                                     placeholder="External/75"
-                                    style="width:100%; box-sizing:border-box; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:#fff;">
+                                    style="width:100%; box-sizing:border-box; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:#000000;">
                             </div>
                             <div>
                                 <label for="m_prac_marks"
-                                    style="color:var(--text-secondary); font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Practical
+                                    style="color: #000000; font-size:0.75rem; font-weight:bold; margin-bottom:4px; display:block;">Practical
                                     Marks (Out of 25)</label>
                                 <input type="number" step="0.1" id="m_prac_marks" name="prac_marks"
                                     placeholder="Prac Marks"
-                                    style="width:100%; box-sizing:border-box; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:#fff;">
+                                    style="width:100%; box-sizing:border-box; padding:10px; border-radius:8px; border:1px solid var(--glass-border); background:rgba(255,255,255,0.05); color:#000000;">
                             </div>
                         </div>
 
@@ -1196,12 +1292,11 @@
                                 style="flex: 2; padding:12px; border-radius:8px;">Save
                                 Prediction Record</button>
                             <button type="button" class="btn-primary" id="facStuResetPassBtn"
-                                style="display: none; flex: 1; padding:12px; border-radius:8px; background: #8B0000; color: #fff; border: 1px solid #8B4513;"
+                                style="display: none; flex: 1; padding:12px; border-radius:8px; background: #8B0000; color: #000000; border: 1px solid #8B4513;"
                                 onclick="resetStudentPasswordFaculty()">Reset Password</button>
                         </div>
                     </form>
-                </div>
-            </div>
+            </div><!-- /right sidebar -->
+        </div><!-- /main 2col grid -->
+    </div><!-- /container -->
 </body>
-
-</html>

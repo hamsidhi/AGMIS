@@ -299,9 +299,9 @@ class DatabaseService:
              conn.execute("UPDATE users SET is_active=0 WHERE username=?", (username,))
         self.add_audit_log(user_id_doing_action, "DELETE_USER", f"Soft deleted user: {username}")
 
-    def get_all_students(self):
+    def get_all_students(self, year=None, batch=None):
         with self.get_conn() as conn:
-            rows = conn.execute("""
+            query = """
                 SELECT 
                     u.username, u.name,
                     sp.year, sp.batch,
@@ -318,7 +318,17 @@ class DatabaseService:
                 FROM users u
                 LEFT JOIN student_profile sp ON sp.student_id = u.username
                 WHERE u.role = 'student' AND COALESCE(u.is_active, 1) = 1
-            """).fetchall()
+            """
+            params = []
+            
+            if year:
+                query += " AND sp.year = ?"
+                params.append(year)
+            if batch:
+                query += " AND sp.batch = ?"
+                params.append(batch)
+                
+            rows = conn.execute(query, params).fetchall()
             
             res = []
             for r in rows:
@@ -454,7 +464,9 @@ class DatabaseService:
             
             # If faculty/admin, they can also see GLOBAL inquiries (receiver_id is NULL)
             if role in ['faculty', 'admin']:
-                query += " OR (receiver_id IS NULL AND subject_code = 'GLOBAL')"
+                query += " OR (receiver_id IS NULL AND subject_code IN ('GLOBAL', 'BROADCAST_FACULTY', 'BROADCAST_ALL'))"
+            if role == 'student':
+                query += " OR (receiver_id IS NULL AND subject_code IN ('BROADCAST_STUDENTS', 'BROADCAST_ALL'))"
                 
             query += ")"
             

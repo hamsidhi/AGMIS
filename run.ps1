@@ -1,9 +1,3 @@
-param(
-  [switch]$NoReload,
-  [int]$Port = 8001,
-  [string]$BindHost = "127.0.0.1"
-)
-
 $ErrorActionPreference = "Stop"
 
 $Root = Split-Path -Parent $MyInvocation.MyCommand.Path
@@ -16,15 +10,6 @@ if (Test-Path $VenvActivate) {
   Write-Host "Warning: .venv not found. Using system Python." -ForegroundColor Yellow
 }
 
-if (Test-Path (Join-Path $Root "backend\requirements.txt")) {
-  try {
-    python -m pip install -r (Join-Path $Root "backend\requirements.txt") | Out-Null
-  } catch {
-    Write-Host "Warning: Failed to ensure requirements. Continuing..." -ForegroundColor Yellow
-  }
-}
-
-$ReloadFlag = ""
-if (-not $NoReload) { $ReloadFlag = "--reload" }
-
-python -m uvicorn app.main:app --app-dir "$Root\backend" $ReloadFlag --host $BindHost --port $Port
+# Navigate to backend and run the server
+Set-Location (Join-Path $Root "backend")
+uvicorn app.main:app --reload --host 127.0.0.1 --port 8001
