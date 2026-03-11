@@ -177,14 +177,13 @@ To push raw academic metrics into the Machine Learning ingestion engine, Faculty
 
 ---
 
-## 📜 Legal & Security
+## 🔒 Security & License
+*AGMIS is a Final Year Academic Capstone Project.*
 
-> **Academic Notice:** Designed exclusively as a capstone university system architecture. Built with "Soft-Deletes" (`is_active` logic boolean architecture) and foundational password routing to simulate Real-World implementations.
-
-*Warning: If deploying for production academic scenarios, do NOT host on exposed ports with raw Student PII. Mandatory integration with OAuth2 pipelines, robust JWT refresh tokens, and strict Transport Layer Security (HTTPS) overrides must be prioritized before institutional deployment.*
+While safe architectural patterns (such as Soft-Deletes via the `is_active` flag, session cookie limits, and password salting mechanisms) have been built into the database structures to resemble a production application, please DO NOT deploy this publicly with real Student Personally Identifiable Information (PII) without migrating the authentication system to a secure provider (like OAuth2 or Supabase) and enabling strict HTTPS routing protocols.
 
 <div align="center">
   <br>
   <b>Built with Intelligence, Engineered for Guidance</b><br>
-  <i>— AGMIS 2026 —</i>
+  <i>— AGMIS —</i>
 </div>
