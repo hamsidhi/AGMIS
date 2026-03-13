@@ -147,7 +147,7 @@ class DatabaseService:
             faculty_data = [
                 ("hiral", "ml123", "faculty", "Hiral Maam", "Machine Learning", "CS-ML-501", 1),
                 ("harish", "gov123", "faculty", "Harish Sir", "Data Governance", "CS-DG-502", 1),
-                ("jennifer", "iot123", "faculty", "Jennifer Maam", "IoT", "CS-IOT-503", 1),
+                ("jenifer", "iot123", "faculty", "Jennifer Maam", "IoT", "CS-IOT-503", 1),
                 ("vivek", "an123", "faculty", "Vivek Sir", "Analysis", "CS-AN-504", 1),
                 ("vibha", "eda123", "faculty", "Vibha Maam", "EDA", "CS-EDA-505", 1)
             ]

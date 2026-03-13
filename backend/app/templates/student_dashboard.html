@@ -388,7 +388,19 @@
                             x: { grid: { display: false }, ticks: { color: '#4A3320' } }
                         },
                         plugins: {
-                            datalabels: { display: false },
+                            datalabels: { 
+                                display: function(context) {
+                                    return context.dataset.label !== 'Target (85%)';
+                                },
+                                color: function(context) {
+                                    return context.dataset.type === 'line' ? '#f59e0b' : '#fff';
+                                },
+                                font: { weight: 'bold', size: 11 },
+                                align: function(context) {
+                                    return context.dataset.type === 'line' ? 'bottom' : 'center';
+                                },
+                                anchor: 'center'
+                            },
                             legend: { position: 'top', labels: { usePointStyle: true, padding: 15, color: '#4A3320' } },
                             tooltip: {
                                 enabled: true,
@@ -483,7 +495,14 @@
                             y: { grid: { display: false }, ticks: { color: '#4A3320' } }
                         },
                         plugins: {
-                            datalabels: { display: false },
+                            datalabels: { 
+                                display: true,
+                                color: '#fff',
+                                font: { weight: 'bold', size: 11 },
+                                align: 'center',
+                                anchor: 'center',
+                                formatter: function(value) { return value > 0 ? value + '%' : ''; }
+                            },
                             legend: { position: 'top', labels: { usePointStyle: true, padding: 15, color: '#4A3320' } },
                             tooltip: {
                                 enabled: true,
