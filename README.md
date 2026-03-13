@@ -1,6 +1,3 @@
-<div align="center">
-  <img src="https://via.placeholder.com/800x200/2A2A2A/FFCC00?text=AGMIS+Command+Center" alt="AGMIS Banner">
-
   <h1>AGMIS</h1>
   <h3>Academic Guidance, Motivation & Intelligence System</h3>
   <i>An advanced, intelligence-driven academic platform transforming student data into predictive, actionable guidance.</i>
